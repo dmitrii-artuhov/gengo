@@ -1,0 +1,6 @@
+# ninja log v5
+4	526	6398661543416313	gengo/CMakeFiles/gengo.dir/gengo.cpp.obj	c3830ec66351afd3
+549	746	6398661545054654	gengo/gengo.exe	1ef8d22e7f81849
+4	597	6398663224075551	gengo/CMakeFiles/gengo.dir/gengo.cpp.obj	c3830ec66351afd3
+1	602	6398663224145376	gengo/CMakeFiles/gengo.dir/language/token.cpp.obj	bbfe6dd2ec8ee448
+603	834	6398663225865874	gengo/gengo.exe	889ad23d1f281855

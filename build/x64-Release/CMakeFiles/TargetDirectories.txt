@@ -1,0 +1,5 @@
+C:/Users/Дмитрий/Desktop/Programming/Projects/C++/Gengo/gengo/build/x64-Release/CMakeFiles/edit_cache.dir
+C:/Users/Дмитрий/Desktop/Programming/Projects/C++/Gengo/gengo/build/x64-Release/CMakeFiles/rebuild_cache.dir
+C:/Users/Дмитрий/Desktop/Programming/Projects/C++/Gengo/gengo/build/x64-Release/gengo/CMakeFiles/gengo.dir
+C:/Users/Дмитрий/Desktop/Programming/Projects/C++/Gengo/gengo/build/x64-Release/gengo/CMakeFiles/edit_cache.dir
+C:/Users/Дмитрий/Desktop/Programming/Projects/C++/Gengo/gengo/build/x64-Release/gengo/CMakeFiles/rebuild_cache.dir
