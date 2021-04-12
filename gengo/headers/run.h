@@ -7,4 +7,4 @@
 std::pair<
 	std::vector<Token>,
 	IllegalCharError*
-> run(std::string& text);
+> run(std::string& file_name, std::string& text);

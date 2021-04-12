@@ -11,8 +11,8 @@
 std::pair<
 	std::vector<Token>,
 	IllegalCharError*
-> run(std::string& text) {
-	Lexer lexer(text);
+> run(std::string& file_name, std::string& text) {
+	Lexer lexer(file_name, text);
 	std::vector <Token> tokens = lexer.MakeTokens();
 
 	std::pair<std::vector <Token>, IllegalCharError*> res = {

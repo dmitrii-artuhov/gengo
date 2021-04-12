@@ -2,6 +2,9 @@
 #include "headers/run.h"
 
 int main() {
+	std::string FILE_NAME = "<console input>";
+
+
 	while (true) {
 		std::cout << "gengo > ";
 
@@ -11,7 +14,7 @@ int main() {
 		std::pair<
 			std::vector<Token>,
 			IllegalCharError*
-		> output = run(line);
+		> output = run(FILE_NAME, line);
 
 		if (output.second != NULL) {
 			std::cout << output.second->As_string() << std::endl;

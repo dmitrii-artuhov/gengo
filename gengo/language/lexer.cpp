@@ -4,15 +4,19 @@
 #include "../gengo.h"
 #include "../utils/cast_types.h"
 #include "../headers/globals.h"
+
 #include "../headers/token.h"
+
+#include "../headers/position.h"
 #include "../headers/error.h" // goes before lexer
 #include "../headers/lexer.h"
 
 
 
-Lexer::Lexer(std::string& text) :
+Lexer::Lexer(std::string& file_name, std::string& text) :
 	text(text),
-	pos(-1),
+	file_name(file_name),
+	pos(new Position(-1, 0, -1, file_name, text)),
 	curr_char(NULL),
 	hasError(false),
 	err(NULL)
@@ -21,8 +25,8 @@ Lexer::Lexer(std::string& text) :
 }
 
 void Lexer::Advance() {
-	this->pos += 1;
-	this->curr_char = (this->pos < text.size()) ? this->text[pos] : NULL;
+	this->pos->Advance(this->curr_char);
+	this->curr_char = (this->pos->index < text.size()) ? this->text[this->pos->index] : NULL;
 }
 
 Token Lexer::MakeNumber() {
@@ -88,14 +92,17 @@ std::vector <Token> Lexer::MakeTokens() {
 			tokens.clear();
 
 			std::string details = "";
-			details += '\'';
-			details += this->curr_char;
-			details += '\'';
+			{
+				details += '\'';
+				details += this->curr_char;
+				details += '\'';
+			}
 			
-			this->hasError = true;
-			this->err = new IllegalCharError(details);
-
+			Position* pos_start = this->pos->Copy();
 			this->Advance();
+
+			this->hasError = true;
+			this->err = new IllegalCharError(details, pos_start, this->pos);
 
 			return tokens;
 		}
