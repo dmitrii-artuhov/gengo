@@ -1,8 +1,5 @@
 ﻿#pragma once
 /*--- Global Libs ---------------*/
 #include <iostream>
+#include <vector>
 #include <string>
-
-
-/*--- Local Headers ---------------*/
-#include "./headers/token.h"

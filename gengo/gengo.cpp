@@ -1,4 +1,5 @@
 ﻿#include "gengo.h"
+#include "headers/run.h"
 
 int main() {
 	while (true) {
@@ -6,7 +7,20 @@ int main() {
 
 		std::string line;
 		std::getline(std::cin, line);
-		std::cout << line << std::endl;
+
+		std::pair<
+			std::vector<Token>,
+			IllegalCharError*
+		> output = run(line);
+
+		if (output.second != NULL) {
+			std::cout << output.second->As_string() << std::endl;
+		}
+		else {
+			for (Token token : output.first) {
+				std::cout << token.Represent() << std::endl;
+			}
+		}
 	}
 	
 	
