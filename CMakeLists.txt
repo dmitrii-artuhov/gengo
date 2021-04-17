@@ -7,3 +7,9 @@ project ("gengo")
 
 # Включите подпроекты.
 add_subdirectory ("gengo")
+
+set_property (TARGET ${PROJECT_NAME}
+  PROPERTY
+    # Enable C++17 standard compliance
+    CXX_STANDARD 17
+)

@@ -1,9 +1,9 @@
 ﻿#include "gengo.h"
 #include "headers/run.h"
+#include "headers/parser.h"
 
 int main() {
 	std::string FILE_NAME = "<console input>";
-
 
 	while (true) {
 		std::cout << "gengo > ";
@@ -20,11 +20,12 @@ int main() {
 			std::cout << output.second->As_string() << std::endl;
 		}
 		else {
-			for (Token token : output.first) {
-				std::cout << token.Represent() << std::endl;
-			}
+			Parser *parser = new Parser(output.first);
+
+			ASTNode* ast = parser->parse();
+			std::cout << ast->Represent() << std::endl;
 		}
-	}
+	}	
 	
 	
 	return 0;

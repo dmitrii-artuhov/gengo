@@ -2,8 +2,7 @@
 // the order of includes matter
 
 #include "../gengo.h"
-#include "../utils/cast_types.h"
-#include "../headers/globals.h"
+#include "../utils/utils.h"
 
 #include "../headers/token.h"
 

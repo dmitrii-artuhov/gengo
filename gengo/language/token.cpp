@@ -1,8 +1,10 @@
 /*--- Tokens -----------------------*/
 #include "../gengo.h"
 #include "../headers/token.h"
-#include "../headers/globals.h"
 
+
+Token::Token() :
+	type(TOKEN_UNDEFINED), value("") {}
 
 Token::Token(const std::string& type, std::string value) :
 	type(type), value(value) {}
@@ -20,3 +22,9 @@ std::string Token::Represent() {
 	return output;
 }
 
+Token* Token::Copy() {
+	const std::string type = this->type;
+	std::string val = this->value;
+
+	return new Token(type, val);
+}

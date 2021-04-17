@@ -6,7 +6,7 @@
 class Lexer {
 private:
 	std::string text, file_name;
-	Position *pos;
+	Position* pos;
 	char curr_char;
 
 	bool hasError;

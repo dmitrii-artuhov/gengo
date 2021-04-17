@@ -24,7 +24,9 @@ std::string Error::As_string() {
 
 		res += "File "
 			+ this->pos_start->file_name + ", line "
-			+ std::to_string((this->pos_start->line + 1));
+			+ std::to_string((this->pos_start->line + 1))
+			+ ":"
+			+ std::to_string((this->pos_start->index + 1));
 		res += "\n";
 	}
 
