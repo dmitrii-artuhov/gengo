@@ -18,6 +18,7 @@ class IntNode;
 class FloatNode;
 // Function Nodes
 class BinOpNode;
+class UnOpNode;
 
 /*--- Main Node --------------------------------------------------*/
 class ASTNode {
@@ -42,9 +43,8 @@ public:
 // Integer Node
 class IntNode {
 private:
-    Token token;
-
 public:
+    Token token;
     IntNode(Token &token);
     std::string Represent();
 };
@@ -52,9 +52,8 @@ public:
 // Float Node
 class FloatNode {
 private:
-    Token token;
-
 public:
+    Token token;
     FloatNode(Token &token);
     std::string Represent();
 };
