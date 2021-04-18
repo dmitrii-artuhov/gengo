@@ -34,7 +34,7 @@ gengo > 10 / 2 + 4
 ```
 
 Types casting:
-```shell
+```asm
 gengo > 2 * 4.5 - 1
 ((INT:2, MULT, FLOAT:4.5), MINUS, INT:1)
 8.000000
