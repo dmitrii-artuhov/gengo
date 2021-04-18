@@ -12,19 +12,19 @@
 ## Snippets
 Basic operations (`+`, `-`, `*`, `/`):
 
-```
+```sh
 gengo > 1 + 2 * 4
 (INT:1, PLUS, (INT:2, MULT, INT:4))
 9
 ```
 Unary operations:
-```
+```sh
 gengo > ---1 + 100
 ((MINUS, (MINUS, (MINUS, INT:1))), PLUS, INT:100)
 99
 ```
 Correct order of operations:
-```
+```sh
 gengo > (1 + 2) * 4
 12
 gengo > 1 + 2 * 4
@@ -34,7 +34,7 @@ gengo > 10 / 2 + 4
 ```
 
 Types casting:
-```
+```sh
 gengo > 2 * 4.5 - 1
 ((INT:2, MULT, FLOAT:4.5), MINUS, INT:1)
 8.000000
