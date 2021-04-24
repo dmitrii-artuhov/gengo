@@ -1,50 +1,41 @@
 /*--- Run - read text input ----------------------*/
 
 #include "../gengo.h"
-#include "../headers/run.h"
-#include "../headers/token.h"
-#include "../headers/lexer.h"
-#include "../headers/error.h"
-#include "../headers/parser.h"
-#include "../headers/interpreter.h"
+#include "./run.h"
+
+#include "./tokens/token.h"
+//#include "./error/error.h"
+#include "./lexer/lexer.h"
+#include "./parser/parser.h"
+#include "./interpreter/interpreter.h"
 
 
-/*
-std::pair<
-	std::vector<Token>,
-	IllegalCharError*
->*/ 
+
 void run(std::string& file_name, std::string& text) {
+	// Lexer
 	Lexer lexer(file_name, text);
-	std::vector <Token> tokens = lexer.MakeTokens();
+	LexerResult* lex_res = lexer.MakeTokens();
 
-	std::pair<std::vector <Token>, IllegalCharError*> lex_res = {
-		tokens,
-		NULL
-	};
-
-	std::pair<bool, IllegalCharError*> error = lexer.getError();
-
-	if (error.first) {
-		lex_res.second = error.second;
-	}
-
-	if (lex_res.second != NULL) {
-		std::cout << lex_res.second->As_string() << std::endl;
+	if (lex_res->error) {
+		std::cout << lex_res->error->As_string() << std::endl;
 	}
 	else {
-		Parser* parser = new Parser(lex_res.first);
+		// Parser
+		Parser* parser = new Parser(lex_res->tokens);
 
-		ASTNode* ast = parser->parse();
-		std::cout << ast->Represent() << std::endl;
+		ParseResult* parse_res = parser->parse();
 
-		Interpreter* interpreter = new Interpreter();
-		NodeValue* interpret_res = interpreter->Visit(ast);
+		if (parse_res->error) {
+			std::cout << parse_res->error->As_string() << std::endl;
+		}
+		else {
+			std::cout << parse_res->ast->Represent() << std::endl;
 
-		std::cout << interpret_res->Represent() << std::endl;
+			// Interpreter
+			Interpreter* interpreter = new Interpreter();
+			NodeValue* interpret_res = interpreter->Visit(parse_res->ast);
+
+			std::cout << interpret_res->Represent() << std::endl;
+		}
 	}
-
-	
-
-	//return res;
 }

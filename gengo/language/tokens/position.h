@@ -11,7 +11,5 @@ public:
 	
 	void Advance(char current_char = '\0');
 
-	Position* Copy() {
-		return new Position(index, line, col, file_name, file_text);
-	}
+	Position Copy();
 };

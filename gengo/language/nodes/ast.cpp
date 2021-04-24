@@ -1,6 +1,6 @@
-#include "../gengo.h"
-#include "../headers/token.h"
-#include "../headers/ast.h"
+#include "../../gengo.h"
+#include "../tokens/token.h"
+#include "../nodes/ast.h"
 
 
 

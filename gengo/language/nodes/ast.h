@@ -1,6 +1,6 @@
 #pragma once
 
-#include "token.h"
+#include "../tokens/token.h"
 
 enum node_t {
     INT_NODE,

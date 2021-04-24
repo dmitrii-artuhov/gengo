@@ -1,6 +1,6 @@
-#include "../gengo.h"
-#include "../utils/utils.h"
-#include "../headers/interpreter.h"
+#include "../../gengo.h"
+#include "../../utils/utils.h"
+#include "../interpreter/interpreter.h"
 
 
 /*--- Interpreter ---------------------------------------------*/
@@ -24,8 +24,6 @@ NodeValue* Interpreter::Visit(ASTNode* node) {
 		return nullptr;
 	}
 }
-
-
 NodeValue* Interpreter::VisitIntNode(ASTNode* node) {
 	//std::cout << "IntNode\n";
 	return new NodeValue(node);
@@ -77,13 +75,12 @@ NodeValue* Interpreter::VisitUnOpNode(ASTNode* node) {
 
 
 
-/*--- Values ---------------------------------------------*/
+/*--- Values ------------------------------------------------*/
 /*--- Main value node ---------------------------------------*/
 NodeValue::NodeValue() {
 	this->type = UNDEFIND_VALUE;
 	this->value = nullptr;
 };
-
 NodeValue::NodeValue(ASTNode* node) {	
 	if (node->type == INT_NODE) {
 		IntNode* curr_node = reinterpret_cast<IntNode*>(node->memory);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./ast.h"
+#include "../nodes/ast.h"
 
 enum value_t {
 	INT_VALUE,
@@ -12,6 +12,7 @@ class IntNumber;
 class FloatNumber;
 
 
+/*--- Interpreter ---------------------------------------------*/
 class Interpreter {
 private:
 
@@ -25,8 +26,6 @@ public:
 };
 
 /*--- Values ---------------------------------------------*/
-
-
 class NodeValue {
 private:
 
@@ -89,7 +88,5 @@ public:
 	NodeValue* Div(NodeValue* other);
 };
 
-
-/*--- Interpreter ---------------------------------------------*/
 
 

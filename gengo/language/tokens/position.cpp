@@ -1,5 +1,5 @@
-#include "../gengo.h"
-#include "../headers/position.h"
+#include "../../gengo.h"
+#include "./position.h"
 
 
 Position::Position(int index, int line, int col, std::string &file_name, std::string &file_text) :
@@ -21,3 +21,8 @@ void Position::Advance(char current_char) {
 		this->col = 0;
 	}
 };
+
+
+Position Position::Copy() {
+	return Position(index, line, col, file_name, file_text);
+}
