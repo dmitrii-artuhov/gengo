@@ -8,10 +8,11 @@
 #include "./lexer/lexer.h"
 #include "./parser/parser.h"
 #include "./interpreter/interpreter.h"
+#include "./context/context.h"
 
 
 
-void run(std::string& file_name, std::string& text) {
+void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 	// Lexer
 	Lexer lexer(file_name, text);
 	LexerResult* lex_res = lexer.MakeTokens();
@@ -32,9 +33,11 @@ void run(std::string& file_name, std::string& text) {
 			std::cout << parse_res->ast->Represent() << std::endl;
 
 			// Interpreter
-			/*
+			Context* ctx = new Context(file_name, nullptr);
+			ctx->symbol_table = global_table;
+
 			Interpreter* interpreter = new Interpreter();
-			RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast);
+			RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast, ctx);
 
 			if (interpret_res->error) {
 				std::cout << interpret_res->error->As_string() << std::endl;
@@ -42,7 +45,6 @@ void run(std::string& file_name, std::string& text) {
 			else {
 				std::cout << interpret_res->result->Represent() << std::endl;
 			}
-			*/
 		}
 	}
 }

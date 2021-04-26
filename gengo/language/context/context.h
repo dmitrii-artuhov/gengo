@@ -1,8 +1,28 @@
 #pragma once
 
 #include "../../gengo.h"
-#include "../symbol_table/symbol_table.h"
+//#include "../interpreter/interpreter.h"
 
+class NodeValue;
+
+
+/*--- Symbol Table -------------------------------------------------*/
+class SymbolTable {
+private:
+public:
+	std::unordered_map <std::string, NodeValue*> table;
+
+	SymbolTable* parent;
+	SymbolTable();
+
+	NodeValue* Get(std::string key);
+	void Set(std::string key, NodeValue* val);
+	void Remove(std::string key);
+};
+
+
+
+/*--- Context -----------------------------------------*/
 class Context {
 private:
 public:
@@ -13,3 +33,4 @@ public:
 	Context();
 	Context(std::string &name, Context* parent);
 };
+

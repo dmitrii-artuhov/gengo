@@ -6,7 +6,8 @@
 const std::string
 ERROR_ILLEGAL_CHAR = "Illegal Character Error",
 ERROR_INVALID_SYNTAX = "Invalid Syntax Error",
-ERROR_INTERNAL = "Internal Error";
+ERROR_INTERNAL = "Internal Error",
+ERROR_RUNTIME = "Run Time Error";
 
 
 class Error {

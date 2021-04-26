@@ -142,7 +142,7 @@ std::string VarAssignNode::Represent() {
 
 
 VarAccessNode::VarAccessNode(Token& token) :
-    token(token) {}
+    token(token), var_name(token.value) {}
 
 std::string VarAccessNode::Represent() {
     std::string res = "";

@@ -1,7 +1,6 @@
 #include "../../gengo.h"
 #include "../../utils/utils.h"
 #include "../interpreter/interpreter.h"
-#include "../context/context.h"
 
 
 /*--- Interpreter ---------------------------------------------*/
@@ -36,26 +35,43 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 }
 
 RunTimeResult* Interpreter::VisitIntNode(ASTNode* node, Context* context) {
-	return (new RunTimeResult())->Success(new NodeValue(node));
+	NodeValue* res = new NodeValue(node);
+	return (new RunTimeResult())->Success(res->SetContext(context));
 }
 RunTimeResult* Interpreter::VisitFloatNode(ASTNode* node, Context* context) {
-	//std::cout << "FloatNode\n";
-	return (new RunTimeResult())->Success(new NodeValue(node));
+	NodeValue* res = new NodeValue(node);
+	return (new RunTimeResult())->Success(res->SetContext(context));
+	// return (new RunTimeResult())->Success(new NodeValue(node));
 }
 
 RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) {
-	
-	
-	/*res = RTResult()
-		var_name = node.var_name_tok.value
-		value = res.register(self.visit(node.value_node, context))
-		if res.error: return res
+	RunTimeResult* res = new RunTimeResult();
 
-			context.symbol_table.set(var_name, value)
-			return res.success(value)*/
+	VarAssignNode* var_node = reinterpret_cast<VarAssignNode*>(node->memory);
+	NodeValue* val = res->Register(this->Visit(var_node->expr, context));
+
+	if (res->error) {
+		return res;
+	}
+
+	context->symbol_table->Set(var_node->var_name, val);
+	return res->Success(val);
 }
 RunTimeResult* Interpreter::VisitVarAccessNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
 
+	VarAccessNode* var_node = reinterpret_cast<VarAccessNode*>(node->memory);
+	NodeValue* val = context->symbol_table->Get(var_node->var_name);
+
+	if (!val) {
+		// Add context here
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("'" + var_node->var_name + "' is not defined")
+		));
+	}
+
+	return res->Success(val);
 }
 
 RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
@@ -66,10 +82,14 @@ RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 
 	NodeValue*  l_node = res->Register(this->Visit(curr_node->left, context));
+	if (this->RunTimeRes->error) {
+		return this->RunTimeRes;
+	}
+
 	NodeValue* r_node = res->Register(this->Visit(curr_node->right, context));
 
-	if (res->error) {
-		return res;
+	if (this->RunTimeRes->error) {
+		return this->RunTimeRes;
 	}
 
 	std::string t = curr_node->oper_token.type;
@@ -132,11 +152,12 @@ RunTimeResult* RunTimeResult::Success(NodeValue* node) {
 }
 
 NodeValue* RunTimeResult::Register(RunTimeResult* res) {
-	if (res->error) {
+	if (res->error && !this->error) {
 		this->error = res->error;
 	}
 	return res->result;
 }
+
 
 
 
@@ -148,7 +169,7 @@ NodeValue::NodeValue() {
 	this->value = nullptr;
 	this->context = nullptr;
 };
-NodeValue::NodeValue(ASTNode* node) {	
+NodeValue::NodeValue(ASTNode* node) {
 	this->context = nullptr;
 
 	if (node->type == INT_NODE) {
@@ -207,11 +228,11 @@ RunTimeResult* NodeValue::Add(NodeValue* other) {
 
 	if (this->type == INT_VALUE) {
 		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
-		return res->Success((curr->Add(other))->SetContext(this->context));
+		return res->Success(curr->Add(other));
 	}
 	else if (this->type == FLOAT_VALUE) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
-		return res->Success((curr->Add(other))->SetContext(this->context));
+		return res->Success(curr->Add(other));
 	}
 	else {
 		return res->Failure(new Error(
@@ -284,16 +305,16 @@ FloatNumber::FloatNumber(long double val) : value(val) {}
 NodeValue* IntNumber::Add(NodeValue* other) {
 	if (other->type == INT_VALUE) {
 		IntNumber* neigh = reinterpret_cast<IntNumber*>(other->value);
-		
+
 		long long res = this->value + neigh->value;
 		return new NodeValue(res);
 	}
 	else if (other->type == FLOAT_VALUE) {
 		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
-		
+
 		long double res = (long double)this->value + neigh->value;
 		return new NodeValue(res);
-	}	
+	}
 }
 
 // subtraction
@@ -374,7 +395,7 @@ NodeValue* FloatNumber::Add(NodeValue* other) {
 
 		long double res = this->value + neigh->value;
 		return new NodeValue(res);
-	}	
+	}
 }
 
 // subtraction
@@ -390,7 +411,7 @@ NodeValue* FloatNumber::Sub(NodeValue* other) {
 
 		long double res = this->value - neigh->value;
 		return new NodeValue(res);
-	}	
+	}
 }
 
 // multiplication
@@ -408,7 +429,6 @@ NodeValue* FloatNumber::Mult(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
 
 // division
 NodeValue* FloatNumber::Div(NodeValue* other) {
@@ -435,5 +455,5 @@ NodeValue* FloatNumber::Div(NodeValue* other) {
 			long double res = this->value / neigh->value;
 			return new NodeValue(res);
 		}
-	}	
+	}
 }

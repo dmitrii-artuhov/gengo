@@ -2,7 +2,9 @@
 
 #include "../nodes/ast.h"
 #include "../error/error.h"
-#include "../context/context.h"
+#include "../context/context.h" // context.h file requires 'class NodeValue' definition
+
+
 
 enum value_t {
 	INT_VALUE,
@@ -10,11 +12,14 @@ enum value_t {
 	UNDEFIND_VALUE
 };
 
-class RunTimeResult; // run time
 
 class NodeValue;
 class IntNumber;
 class FloatNumber;
+
+
+
+class RunTimeResult; // run time
 
 
 /*--- Interpreter ---------------------------------------------*/
@@ -51,6 +56,10 @@ public:
 	NodeValue* Register(RunTimeResult* res);
 };
 
+
+
+
+
 /*--- Values ---------------------------------------------*/
 class NodeValue {
 private:
@@ -59,7 +68,7 @@ public:
 	value_t type;
 	void* value; // contains one of the classes below
 	// (later strings and other entities will be added, so this will be handy, hopefully)
-	Context* context;
+	Context *context;
 
 	NodeValue();
 	NodeValue(ASTNode* node);
@@ -67,7 +76,7 @@ public:
 	NodeValue(long double val);
 
 	std::string Represent();
-	NodeValue* SetContext(Context *context);
+	NodeValue* SetContext(Context* ctx);
 
 	RunTimeResult* Add(NodeValue* other);
 	RunTimeResult* Sub(NodeValue* other);
@@ -101,7 +110,7 @@ public:
 	long double value;
 
 	FloatNumber(long double val);
-	
+
 	// addition
 	NodeValue* Add(NodeValue* other);
 
