@@ -49,9 +49,11 @@ ParseResult* Parser::Factor() {
 	ASTNode* node;
 
 	if (this->curr_token.type == TOKEN_PLUS || this->curr_token.type == TOKEN_MINUS) {
+		Token token = this->curr_token;
+
 		this->Advance();
 		ASTNode* factor = this->ParseRes->Register(this->Factor());
-		node = new ASTNode(this->curr_token, factor);
+		node = new ASTNode(token, factor);
 		// this->Advance(); ???
 	}
 	else if (this->curr_token.type == TOKEN_INT || this->curr_token.type == TOKEN_FLOAT) {

@@ -62,13 +62,15 @@ NodeValue* Interpreter::VisitUnOpNode(ASTNode* node) {
 	//std::cout << "UnOpNode\n";
 
 	UnOpNode* curr_node = reinterpret_cast<UnOpNode*>(node->memory);
+	NodeValue* r_node = this->Visit(curr_node->node);
 
 	if (curr_node->oper_token.type == TOKEN_MINUS) {
-		NodeValue* r_node = this->Visit(curr_node->node);
 		NodeValue* oper_node = new NodeValue(-1LL);
 
 		return oper_node->Mult(r_node);
 	}
+
+	return r_node;
 }
 
 
