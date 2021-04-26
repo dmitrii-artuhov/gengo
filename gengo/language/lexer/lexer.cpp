@@ -11,6 +11,7 @@
 #include "../lexer/lexer.h"
 
 
+
 /*--- Lexer ------------------------------------------------*/
 Lexer::Lexer(std::string& file_name, std::string& text) :
 	text(text),
@@ -27,7 +28,7 @@ void Lexer::Advance() {
 	this->curr_char = (this->pos.index < text.size()) ? this->text[this->pos.index] : NULL;
 }
 
-Token Lexer::MakeNumber() {
+Token Lexer::MakeNumberToken() {
 	std::string num_str = "";
 	int dot_cnt = 0;
 	std::string collection = DIGITS + ".";
@@ -53,6 +54,29 @@ Token Lexer::MakeNumber() {
 	}
 }
 
+Token Lexer::MakeIdentifier() {
+	std::string id_str = "";
+	std::string collection = DIGITS + LETTERS + "_";
+	
+	Position pos_start = this->pos.Copy();
+
+	while (this->curr_char != NULL
+		&& collection.find(this->curr_char) != std::string::npos) {
+		id_str += this->curr_char;
+		this->Advance();
+	}
+	
+	if (find(TYPES.begin(), TYPES.end(), id_str) != TYPES.end()) {
+		return Token(TOKEN_TYPE, pos_start, this->pos, id_str);
+	}
+	else if (find(KEYWORDS.begin(), KEYWORDS.end(), id_str) != KEYWORDS.end()) {
+		return Token(TOKEN_KEYWORD, pos_start, this->pos, id_str);
+	}
+	else {
+		return Token(TOKEN_IDENTIFIER, pos_start, this->pos, id_str);
+	}
+}
+
 LexerResult* Lexer::MakeTokens() {
 	std::vector <Token> tokens;
 
@@ -61,7 +85,7 @@ LexerResult* Lexer::MakeTokens() {
 			this->Advance();
 		}
 		else if (DIGITS.find(this->curr_char) != std::string::npos) {
-			tokens.push_back(this->MakeNumber());
+			tokens.push_back(this->MakeNumberToken());
 		}
 		else if (this->curr_char == '+') {
 			tokens.push_back(Token(TOKEN_PLUS, this->pos, this->pos));
@@ -79,13 +103,20 @@ LexerResult* Lexer::MakeTokens() {
 			tokens.push_back(Token(TOKEN_DIV, this->pos, this->pos));
 			this->Advance();
 		}
-
 		else if (this->curr_char == '(') {
 			tokens.push_back(Token(TOKEN_LPAREN, this->pos, this->pos));
 			this->Advance();
 		}
 		else if (this->curr_char == ')') {
 			tokens.push_back(Token(TOKEN_RPAREN, this->pos, this->pos));
+			this->Advance();
+		}
+		else if (std::string("_" + LETTERS).find(this->curr_char) != std::string::npos) {
+			tokens.push_back(this->MakeIdentifier());
+		}
+		else if (this->curr_char == '=') {
+			// upgrade to find ==
+			tokens.push_back(Token(TOKEN_EQ, this->pos, this->pos));
 			this->Advance();
 		}
 		else {
@@ -117,6 +148,12 @@ LexerResult* Lexer::MakeTokens() {
 		tokens,
 		NULL
 	);
+
+	// DEBUG
+	if (0) 
+		for (Token t : tokens) {
+			std::cout << t.Represent() << std::endl;
+		}
 
 	return this->LexResult;
 }

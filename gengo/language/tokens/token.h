@@ -4,19 +4,41 @@
 
 const std::string
 TOKEN_UNDEFINED = "UNDEFINED",
+
 TOKEN_INT = "INT",
 TOKEN_FLOAT = "FLOAT",
+
 TOKEN_PLUS = "PLUS",
 TOKEN_MINUS = "MINUS",
 TOKEN_MULT = "MULT",
 TOKEN_DIV = "DIV",
+
 TOKEN_LPAREN = "LPAREN",
 TOKEN_RPAREN = "RPAREN",
-TOKEN_EOF = "EOF";
+
+TOKEN_EQ = "EQ",
+
+TOKEN_EOF = "EOF",
+
+TOKEN_TYPE = "TYPE",
+TOKEN_KEYWORD = "KEYWORD",
+TOKEN_IDENTIFIER = "IDENTIFIER"
+;
 
 
 const std::string
-DIGITS = "0123456789";
+DIGITS = "0123456789",
+LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+const std::vector <std::string> TYPES = {
+	"int",
+	"float"
+};
+
+const std::vector <std::string> KEYWORDS = {
+	
+};
 
 
 class Token {

@@ -2,6 +2,7 @@
 #include "../tokens/token.h"
 #include "../parser/parser.h"
 #include "../error/error.h"
+#include "../nodes/ast.h"
 
 
 
@@ -31,11 +32,9 @@ ParseResult* Parser::parse() {
 	this->ParseRes = this->Expr();
 
 	if (!this->ParseRes->error && this->curr_token.type != TOKEN_EOF) {
-		std::string details = "Expected '+', '-', '*' or '/'";
-
 		return this->ParseRes->Failure(new Error(
 			ERROR_INVALID_SYNTAX,
-			details,
+			std::string("Expected '+', '-', '*' or '/'"),
 			this->curr_token.pos_start,
 			this->curr_token.pos_end
 		));
@@ -55,30 +54,43 @@ ParseResult* Parser::Factor() {
 		ASTNode* factor = this->ParseRes->Register(this->Factor());
 		node = new ASTNode(token, factor);
 		// this->Advance(); ???
+
+		return this->ParseRes->Success(node);
 	}
-	else if (this->curr_token.type == TOKEN_INT || this->curr_token.type == TOKEN_FLOAT) {
+	else if (this->curr_token.type == TOKEN_IDENTIFIER || this->curr_token.type == TOKEN_INT || this->curr_token.type == TOKEN_FLOAT) {
 		node = new ASTNode(this->curr_token);
 		this->Advance();
+
+		return this->ParseRes->Success(node);
 	}
 	else if (this->curr_token.type == TOKEN_LPAREN) {
 		this->Advance();
 		node = this->ParseRes->Register(this->Expr());
 
+		if (this->ParseRes->error) {
+			return this->ParseRes;
+		}
+
 		if (this->curr_token.type == TOKEN_RPAREN) {
 			this->Advance();
+			return this->ParseRes->Success(node);
 		}
 		else {
-			std::string details = "Expected ')'";
 			return this->ParseRes->Failure(new Error(
 				ERROR_INVALID_SYNTAX,
-				details,
+				std::string("Expected ')'"),
 				this->curr_token.pos_start,
 				this->curr_token.pos_end
 			));
 		}
 	}
 
-	return this->ParseRes->Success(node);
+	return this->ParseRes->Failure(new Error(
+		ERROR_INVALID_SYNTAX,
+		std::string("Expected '+', '-', '(' or INT|FLOAT"),
+		this->curr_token.pos_start,
+		this->curr_token.pos_end
+	));
 }
 
 ParseResult* Parser::Term() {
@@ -89,35 +101,94 @@ ParseResult* Parser::Term() {
 
 		while (t == TOKEN_DIV || t == TOKEN_MULT) {
 			Token oper_token = this->curr_token;
-			
+
 			this->Advance();
-			
+
 			ASTNode* right = this->ParseRes->Register(this->Factor());
+
+			if (this->ParseRes->error) {
+				return this->ParseRes;
+			}
 
 			left = new ASTNode(left, oper_token, right);
 			t = this->curr_token.type;
 		}
+
+
+		return this->ParseRes->Success(left);
 	}
-	return this->ParseRes->Success(left);
+
+	return this->ParseRes->Failure(new Error(
+		ERROR_INVALID_SYNTAX,
+		std::string("Expected '*', '/', '(' or INT|FLOAT"),
+		this->curr_token.pos_start,
+		this->curr_token.pos_end
+	));
 }
 
 ParseResult* Parser::Expr() {
-	ASTNode* left = this->ParseRes->Register(this->Term());
+	if (this->curr_token.type == TOKEN_TYPE) {
+		Token type_token = this->curr_token;
+		this->Advance();
 
-	if (this->curr_token.type != TOKEN_UNDEFINED) {
-		std::string t = this->curr_token.type;
-		while (t == TOKEN_PLUS || t == TOKEN_MINUS) {
-			Token oper_token = this->curr_token;
-
-			this->Advance();
-
-			ASTNode* right = this->ParseRes->Register(this->Term());
-
-			left = new ASTNode(left, oper_token, right);
-			t = this->curr_token.type;
+		if (this->curr_token.type != TOKEN_IDENTIFIER) {
+			return this->ParseRes->Failure(new Error(
+				ERROR_INVALID_SYNTAX,
+				std::string("Expected identifier"),
+				this->curr_token.pos_start,
+				this->curr_token.pos_end
+			));
 		}
+		
+		std::string var_name = this->curr_token.value;
+		this->Advance();
+
+		if (this->curr_token.type != TOKEN_EQ) {
+			return this->ParseRes->Failure(new Error(
+				ERROR_INVALID_SYNTAX,
+				std::string("Expected '='"),
+				this->curr_token.pos_start,
+				this->curr_token.pos_end
+			));
+		}
+
+		this->Advance();
+
+		ASTNode* node = this->ParseRes->Register(this->Expr());
+
+		if (this->ParseRes->error) {
+			return this->ParseRes;
+		}
+
+		return this->ParseRes->Success(new ASTNode(type_token, var_name, node));
 	}
-	return this->ParseRes->Success(left);
+	else {
+		ASTNode* left = this->ParseRes->Register(this->Term());
+
+		if (this->curr_token.type != TOKEN_UNDEFINED) {
+			std::string t = this->curr_token.type;
+			while (t == TOKEN_PLUS || t == TOKEN_MINUS) {
+				Token oper_token = this->curr_token;
+
+				this->Advance();
+
+				ASTNode* right = this->ParseRes->Register(this->Term());
+
+				left = new ASTNode(left, oper_token, right);
+				t = this->curr_token.type;
+			}
+
+
+			return this->ParseRes->Success(left);
+		}
+
+		return this->ParseRes->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected identifier or expression"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
 }
 
 

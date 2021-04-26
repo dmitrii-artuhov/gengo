@@ -10,6 +10,14 @@ Position::Position(int index, int line, int col, std::string &file_name, std::st
 	file_text(file_text)
 {};
 
+Position::Position() :
+	index(-1),
+	line(-1),
+	col(-1),
+	file_name(std::string("")),
+	file_text(std::string(""))
+{};
+
 
 
 void Position::Advance(char current_char) {

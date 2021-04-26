@@ -1,8 +1,9 @@
-expr    : term ((PLUS|MINUS) term)*
+expr    : KEYWORD:TYPE IDENTIFIER EQ expr 
+		: term ((PLUS|MINUS) term)*
 
 term    : factor ((MUL|DIV) factor)*
 
-factor  : INT|FLOAT
+factor  : INT|FLOAT|IDENTIFIER
 		: (PLUS|MINUS) factor
 		: LPAREN expr RPAREN
 

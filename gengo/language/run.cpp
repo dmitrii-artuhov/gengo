@@ -32,10 +32,17 @@ void run(std::string& file_name, std::string& text) {
 			std::cout << parse_res->ast->Represent() << std::endl;
 
 			// Interpreter
+			/*
 			Interpreter* interpreter = new Interpreter();
-			NodeValue* interpret_res = interpreter->Visit(parse_res->ast);
+			RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast);
 
-			std::cout << interpret_res->Represent() << std::endl;
+			if (interpret_res->error) {
+				std::cout << interpret_res->error->As_string() << std::endl;
+			}
+			else {
+				std::cout << interpret_res->result->Represent() << std::endl;
+			}
+			*/
 		}
 	}
 }

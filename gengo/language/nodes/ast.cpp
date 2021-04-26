@@ -26,11 +26,22 @@ ASTNode::ASTNode(Token &token) {
         this->type = FLOAT_NODE;
         this->memory = reinterpret_cast<void*>(new FloatNode(token));
     }
+    else if (t == TOKEN_IDENTIFIER) {
+        this->type = VAR_ACCESS_NODE;
+        this->memory = reinterpret_cast<void*>(new VarAccessNode(token));
+    }
     else {
         this->type = UNDEFIND_NODE;
         this->memory = nullptr;
     }
 }
+
+// variables
+ASTNode::ASTNode(Token &token, std::string &var_name, ASTNode* expr) {
+    this->type = VAR_ASSIGN_NODE;
+    this->memory = reinterpret_cast<void*>(new VarAssignNode(token, var_name, expr));
+}
+
 
 // operators
 // binary
@@ -78,6 +89,14 @@ std::string ASTNode::Represent() {
         FloatNode* node = reinterpret_cast<FloatNode*>(this->memory);
         res += node->Represent();
     }
+    else if (this->type == VAR_ASSIGN_NODE) {
+        VarAssignNode* node = reinterpret_cast<VarAssignNode*>(this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == VAR_ACCESS_NODE) {
+        VarAccessNode* node = reinterpret_cast<VarAccessNode*>(this->memory);
+        res += node->Represent();
+    }
     else if (this->type == BINOP_NODE) {
         BinOpNode* node = reinterpret_cast<BinOpNode*>(this->memory);
         res += node->Represent();
@@ -103,6 +122,35 @@ FloatNode::FloatNode(Token& token): token(token) {}
 
 std::string FloatNode::Represent() {
     return this->token.Represent();
+}
+
+
+/*--- Variable Nodes ----------------------------------------*/
+VarAssignNode::VarAssignNode(Token& token, std::string& var_name, ASTNode* expr) :
+token(token), var_name(var_name), expr(expr) {}
+
+std::string VarAssignNode::Represent() {
+    std::string res = "";
+    {
+        res += "(" + this->token.Represent() + ", ";
+        res += "IDENTIFIER:" + this->var_name + ", ";
+        res += this->expr->Represent() + ")";
+    }
+
+    return res;
+}
+
+
+VarAccessNode::VarAccessNode(Token& token) :
+    token(token) {}
+
+std::string VarAccessNode::Represent() {
+    std::string res = "";
+    {
+        res += "(" + this->token.Represent() + ")";
+    }
+
+    return res;
 }
 
 
@@ -138,3 +186,9 @@ std::string UnOpNode::Represent() {
     return res;
 }
 
+/*--- UndefinedNode ----------------------------------------------*/
+UndefinedNode::UndefinedNode(Token &token): token(token) {}
+
+std::string UndefinedNode::Represent() {
+    return this->token.Represent();
+}

@@ -1,44 +1,76 @@
 #include "../../gengo.h"
 #include "../../utils/utils.h"
 #include "../interpreter/interpreter.h"
+#include "../context/context.h"
 
 
 /*--- Interpreter ---------------------------------------------*/
 
-NodeValue* Interpreter::Visit(ASTNode* node) {
+RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	if (node->type == INT_NODE) {
-		return this->VisitIntNode(node);
+		this->RunTimeRes = this->VisitIntNode(node, context);
 	}
 	else if (node->type == FLOAT_NODE) {
-		return this->VisitFloatNode(node);
+		this->RunTimeRes = this->VisitFloatNode(node, context);
+	}
+	else if (node->type == VAR_ASSIGN_NODE) {
+		this->RunTimeRes = this->VisitVarAssignNode(node, context);
+	}
+	else if (node->type == VAR_ACCESS_NODE) {
+		this->RunTimeRes = this->VisitVarAccessNode(node, context);
 	}
 	else if (node->type == BINOP_NODE) {
-		return this->VisitBinOpNode(node);
+		this->RunTimeRes = this->VisitBinOpNode(node, context);
 	}
 	else if (node->type == UNOP_NODE) {
-		return this->VisitUnOpNode(node);
+		this->RunTimeRes = this->VisitUnOpNode(node, context);
 	}
 	else {
-		std::cout << "Error! Undefined node type\n";
-		// error
-		return nullptr;
+		this->RunTimeRes->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined node type")
+		));
 	}
+
+	return this->RunTimeRes;
 }
-NodeValue* Interpreter::VisitIntNode(ASTNode* node) {
-	//std::cout << "IntNode\n";
-	return new NodeValue(node);
+
+RunTimeResult* Interpreter::VisitIntNode(ASTNode* node, Context* context) {
+	return (new RunTimeResult())->Success(new NodeValue(node));
 }
-NodeValue* Interpreter::VisitFloatNode(ASTNode* node) {
+RunTimeResult* Interpreter::VisitFloatNode(ASTNode* node, Context* context) {
 	//std::cout << "FloatNode\n";
-	return new NodeValue(node);
+	return (new RunTimeResult())->Success(new NodeValue(node));
 }
-NodeValue* Interpreter::VisitBinOpNode(ASTNode* node) {
+
+RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) {
+	
+	
+	/*res = RTResult()
+		var_name = node.var_name_tok.value
+		value = res.register(self.visit(node.value_node, context))
+		if res.error: return res
+
+			context.symbol_table.set(var_name, value)
+			return res.success(value)*/
+}
+RunTimeResult* Interpreter::VisitVarAccessNode(ASTNode* node, Context* context) {
+
+}
+
+RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
 	//std::cout << "BinOpNode\n";
 
 	BinOpNode* curr_node = reinterpret_cast<BinOpNode*>(node->memory);
 
-	NodeValue*  l_node = this->Visit(curr_node->left);
-	NodeValue* r_node = this->Visit(curr_node->right);
+	RunTimeResult* res = new RunTimeResult();
+
+	NodeValue*  l_node = res->Register(this->Visit(curr_node->left, context));
+	NodeValue* r_node = res->Register(this->Visit(curr_node->right, context));
+
+	if (res->error) {
+		return res;
+	}
 
 	std::string t = curr_node->oper_token.type;
 	if (t == TOKEN_PLUS) {
@@ -54,15 +86,21 @@ NodeValue* Interpreter::VisitBinOpNode(ASTNode* node) {
 		return l_node->Div(r_node);
 	}
 	else {
-		// error, hopefully we don't reach here
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined operation token"),
+			curr_node->oper_token.pos_start,
+			curr_node->oper_token.pos_end
+		));
 	}
-
 }
-NodeValue* Interpreter::VisitUnOpNode(ASTNode* node) {
+RunTimeResult* Interpreter::VisitUnOpNode(ASTNode* node, Context* context) {
 	//std::cout << "UnOpNode\n";
 
+	RunTimeResult* res = new RunTimeResult();
+
 	UnOpNode* curr_node = reinterpret_cast<UnOpNode*>(node->memory);
-	NodeValue* r_node = this->Visit(curr_node->node);
+	NodeValue* r_node = res->Register(this->Visit(curr_node->node, context));
 
 	if (curr_node->oper_token.type == TOKEN_MINUS) {
 		NodeValue* oper_node = new NodeValue(-1LL);
@@ -70,9 +108,35 @@ NodeValue* Interpreter::VisitUnOpNode(ASTNode* node) {
 		return oper_node->Mult(r_node);
 	}
 
-	return r_node;
+	return res->Success(r_node);
 }
 
+
+
+/*--- RunTimeResult -----------------------------------------*/
+
+RunTimeResult::RunTimeResult() :
+result(nullptr), error(nullptr) {}
+
+RunTimeResult::RunTimeResult(NodeValue* node, Error* err) :
+result(node), error(err) {}
+
+RunTimeResult* RunTimeResult::Failure(Error* err) {
+	this->error = err;
+	return this;
+}
+
+RunTimeResult* RunTimeResult::Success(NodeValue* node) {
+	this->result = node;
+	return this;
+}
+
+NodeValue* RunTimeResult::Register(RunTimeResult* res) {
+	if (res->error) {
+		this->error = res->error;
+	}
+	return res->result;
+}
 
 
 
@@ -82,8 +146,11 @@ NodeValue* Interpreter::VisitUnOpNode(ASTNode* node) {
 NodeValue::NodeValue() {
 	this->type = UNDEFIND_VALUE;
 	this->value = nullptr;
+	this->context = nullptr;
 };
 NodeValue::NodeValue(ASTNode* node) {	
+	this->context = nullptr;
+
 	if (node->type == INT_NODE) {
 		IntNode* curr_node = reinterpret_cast<IntNode*>(node->memory);
 		long long val = cast_string_to_ll(curr_node->token.value);
@@ -104,13 +171,16 @@ NodeValue::NodeValue(ASTNode* node) {
 	}
 };
 NodeValue::NodeValue(long long val) {
+	this->context = nullptr;
 	this->type = INT_VALUE;
 	this->value = reinterpret_cast<void*> (new IntNumber(val));
 }
 NodeValue::NodeValue(long double val) {
+	this->context = nullptr;
 	this->type = FLOAT_VALUE;
 	this->value = reinterpret_cast<void*> (new FloatNumber(val));
 }
+
 
 std::string NodeValue::Represent() {
 	std::string res = "";
@@ -126,49 +196,82 @@ std::string NodeValue::Represent() {
 
 	return res;
 }
+NodeValue* NodeValue::SetContext(Context* context) {
+	this->context = context;
+	return this;
+}
 
 // operations
-NodeValue* NodeValue::Add(NodeValue* other) {
+RunTimeResult* NodeValue::Add(NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult();
+
 	if (this->type == INT_VALUE) {
 		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
-		return curr->Add(other);
+		return res->Success((curr->Add(other))->SetContext(this->context));
 	}
 	else if (this->type == FLOAT_VALUE) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
-		return curr->Add(other);
+		return res->Success((curr->Add(other))->SetContext(this->context));
 	}
 	else {
-		// error, undefined value type
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type")
+		));
 	}
 }
-NodeValue* NodeValue::Sub(NodeValue* other) {
+RunTimeResult* NodeValue::Sub(NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult();
+
 	if (this->type == INT_VALUE) {
 		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
-		return curr->Sub(other);
+		return res->Success(curr->Sub(other));
 	}
 	else if (this->type == FLOAT_VALUE) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
-		return curr->Sub(other);
+		return res->Success(curr->Sub(other));
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type")
+		));
 	}
 }
-NodeValue* NodeValue::Mult(NodeValue* other) {
+RunTimeResult* NodeValue::Mult(NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult();
+
 	if (this->type == INT_VALUE) {
 		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
-		return curr->Mult(other);
+		return res->Success(curr->Mult(other));
 	}
 	else if (this->type == FLOAT_VALUE) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
-		return curr->Mult(other);
+		return res->Success(curr->Mult(other));
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type")
+		));
 	}
 }
-NodeValue* NodeValue::Div(NodeValue* other) {
+RunTimeResult* NodeValue::Div(NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult();
+
 	if (this->type == INT_VALUE) {
 		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
-		return curr->Div(other);
+		return res->Success(curr->Div(other));
 	}
 	else if (this->type == FLOAT_VALUE) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
-		return curr->Div(other);
+		return res->Success(curr->Div(other));
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type")
+		));
 	}
 }
 

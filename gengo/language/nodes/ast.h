@@ -5,6 +5,8 @@
 enum node_t {
     INT_NODE,
     FLOAT_NODE,
+    VAR_ASSIGN_NODE,
+    VAR_ACCESS_NODE,
     BINOP_NODE,
     UNOP_NODE,
     UNDEFIND_NODE,
@@ -16,7 +18,10 @@ class ASTNode;
 // Type Nodes
 class IntNode;
 class FloatNode;
-// Function Nodes
+// Variables
+class VarAssignNode;
+class VarAccessNode;
+// Operators Nodes
 class BinOpNode;
 class UnOpNode;
 
@@ -30,8 +35,12 @@ public:
 
     // undefined
     ASTNode();
-    // types
+    // types and access variable
     ASTNode(Token &token);
+    // variables
+    ASTNode(Token& token, std::string &var_name, ASTNode* expr);
+
+
     // operators
     ASTNode(ASTNode* left, Token& token, ASTNode* right);
     ASTNode(Token& token, ASTNode* node);
@@ -58,6 +67,29 @@ public:
     std::string Represent();
 };
 
+/*--- Variables ---------------------------------------*/
+class VarAssignNode {
+private:
+public:
+    Token token; // { TOKEN_TYPE, int|float }
+    std::string var_name; // name
+    ASTNode* expr;
+
+    VarAssignNode(Token &token, std::string &var_name, ASTNode* expr);
+    std::string Represent();
+};
+
+class VarAccessNode {
+private:
+public:
+    Token token; // { TOKEN_INDETIFIER, var_name }
+    std::string var_name; // name
+
+    VarAccessNode(Token& token);
+    std::string Represent();
+};
+
+
 
 /*--- Operation Nodes ---------------------------------------*/
 // Binary Operator
@@ -81,5 +113,17 @@ public:
     Token oper_token;
 
     UnOpNode(Token& oper_token, ASTNode *node);
+    std::string Represent();
+};
+
+
+/*--- Undefined Node ---------------------------------------*/
+class UndefinedNode {
+private:
+
+public:
+    Token token;
+
+    UndefinedNode(Token& token);
     std::string Represent();
 };

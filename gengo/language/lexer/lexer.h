@@ -1,7 +1,12 @@
 #pragma once
 
+
+#include "../tokens/token.h"
 #include "../tokens/position.h"
 #include "../error/error.h"
+
+
+
 
 class LexerResult;
 
@@ -17,9 +22,11 @@ private:
 
 public:
 	Lexer(std::string& file_name, std::string& text);
-
 	void Advance();
-	Token MakeNumber();
+
+	// Helpers
+	Token MakeIdentifier();
+	Token MakeNumberToken();
 	
 	LexerResult* MakeTokens();
 };

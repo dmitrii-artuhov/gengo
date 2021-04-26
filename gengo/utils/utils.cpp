@@ -18,3 +18,10 @@ std::string cancat(std::vector <std::string>& arr) {
 	return res;
 }
 
+template <typename T>
+void print_vector(std::vector <T>& arr, std::string &sep) {
+	for (T a : arr) {
+		std::cout << a << sep;
+	}
+}
+

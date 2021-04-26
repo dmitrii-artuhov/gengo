@@ -1,12 +1,17 @@
 #pragma once
 
 #include "../nodes/ast.h"
+#include "../error/error.h"
+#include "../context/context.h"
 
 enum value_t {
 	INT_VALUE,
 	FLOAT_VALUE,
 	UNDEFIND_VALUE
 };
+
+class RunTimeResult; // run time
+
 class NodeValue;
 class IntNumber;
 class FloatNumber;
@@ -15,14 +20,35 @@ class FloatNumber;
 /*--- Interpreter ---------------------------------------------*/
 class Interpreter {
 private:
+	RunTimeResult* RunTimeRes;
 
 public:
-	NodeValue* Visit(ASTNode* node);
+	RunTimeResult* Visit(ASTNode* node, Context* context);
 
-	NodeValue* VisitIntNode(ASTNode* node);
-	NodeValue* VisitFloatNode(ASTNode* node);
-	NodeValue* VisitBinOpNode(ASTNode* node);
-	NodeValue* VisitUnOpNode(ASTNode* node);
+	RunTimeResult* VisitIntNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitFloatNode(ASTNode* node, Context* context);
+
+	RunTimeResult* VisitVarAssignNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitVarAccessNode(ASTNode* node, Context* context);
+
+	RunTimeResult* VisitBinOpNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitUnOpNode(ASTNode* node, Context* context);
+};
+
+
+/*--- RunTimeResult -----------------------------------------*/
+class RunTimeResult {
+private:
+public:
+	NodeValue* result;
+	Error* error;
+
+	RunTimeResult();
+	RunTimeResult(NodeValue* node, Error* err);
+
+	RunTimeResult* Failure(Error* err);
+	RunTimeResult* Success(NodeValue* node);
+	NodeValue* Register(RunTimeResult* res);
 };
 
 /*--- Values ---------------------------------------------*/
@@ -33,6 +59,7 @@ public:
 	value_t type;
 	void* value; // contains one of the classes below
 	// (later strings and other entities will be added, so this will be handy, hopefully)
+	Context* context;
 
 	NodeValue();
 	NodeValue(ASTNode* node);
@@ -40,12 +67,12 @@ public:
 	NodeValue(long double val);
 
 	std::string Represent();
+	NodeValue* SetContext(Context *context);
 
-
-	NodeValue* Add(NodeValue* other);
-	NodeValue* Sub(NodeValue* other);
-	NodeValue* Mult(NodeValue* other);
-	NodeValue* Div(NodeValue* other);
+	RunTimeResult* Add(NodeValue* other);
+	RunTimeResult* Sub(NodeValue* other);
+	RunTimeResult* Mult(NodeValue* other);
+	RunTimeResult* Div(NodeValue* other);
 };
 
 class IntNumber {
