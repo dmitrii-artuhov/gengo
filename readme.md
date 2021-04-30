@@ -52,6 +52,14 @@ gengo > b
 10.000000
 ```
 
+Errors printing:
+gengo > int a = 10
+10
+gengo > a = a + b
+Calls trace:
+File <console input>
+Run Time Error:'b' is not defined
+
 ## Features (pre-release 0.1.0)
 - Supports arithmetic operations in  console
 - Correct order of binary and unary operations
