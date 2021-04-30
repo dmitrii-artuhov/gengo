@@ -2,6 +2,17 @@
 > Gengo. Pet programming language build for fun.
 
 
+Language Entity | Ruleset
+------------ | -------------
+expr    | (KEYWORD:TYPE)? IDENTIFIER EQ expr
+&nbsp; 	| term ((PLUS\|MINUS) term)*
+term    | factor ((MUL\|DIV) factor)*
+factor  | INT\|FLOAT\|IDENTIFIER
+&nbsp;	| (PLUS\|MINUS) factor
+&nbsp;	| LPAREN expr RPAREN
+
+
+
 ## Features (pre-release 0.1.0)
 - Supports arithmetic operations in  console
 - Correct order of binary and unary operations
