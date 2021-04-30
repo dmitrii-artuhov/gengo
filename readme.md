@@ -2,6 +2,7 @@
 > Gengo. Pet programming language build for fun.
 
 
+## Language Grammar
 Language Entity | Ruleset
 ------------ | -------------
 expr    | (KEYWORD:TYPE)? IDENTIFIER EQ expr
