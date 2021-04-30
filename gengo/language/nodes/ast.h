@@ -5,23 +5,29 @@
 enum node_t {
     INT_NODE,
     FLOAT_NODE,
+    
     VAR_ASSIGN_NODE,
     VAR_REASSIGN_NODE,
     VAR_ACCESS_NODE,
+    
     BINOP_NODE,
     UNOP_NODE,
+
     UNDEFIND_NODE,
 };
 
 
 // Main Node
 class ASTNode;
+
 // Type Nodes
 class IntNode;
 class FloatNode;
+
 // Variables
 class VarAssignNode;
 class VarAccessNode;
+
 // Operators Nodes
 class BinOpNode;
 class UnOpNode;

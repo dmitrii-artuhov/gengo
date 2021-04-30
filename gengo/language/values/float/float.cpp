@@ -9,8 +9,10 @@
 
 
 /*--- FloatNumber ---------------------------------------*/
+// constructors
 FloatNumber::FloatNumber(long double val) : value(val) {}
 
+// operations
 // addition
 NodeValue* FloatNumber::Add(NodeValue* other) {
 	if (other->type == INT_VALUE) {
@@ -26,7 +28,6 @@ NodeValue* FloatNumber::Add(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
 // subtraction
 NodeValue* FloatNumber::Sub(NodeValue* other) {
 	if (other->type == INT_VALUE) {
@@ -42,7 +43,6 @@ NodeValue* FloatNumber::Sub(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
 // multiplication
 NodeValue* FloatNumber::Mult(NodeValue* other) {
 	if (other->type == INT_VALUE) {
@@ -58,7 +58,6 @@ NodeValue* FloatNumber::Mult(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
 // division
 NodeValue* FloatNumber::Div(NodeValue* other) {
 	if (other->type == INT_VALUE) {

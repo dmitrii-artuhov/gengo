@@ -12,6 +12,7 @@
 #include "../float/float.h"
 
 /*--- Main value node ---------------------------------------*/
+// constructors
 NodeValue::NodeValue() {
 	this->type = UNDEFIND_VALUE;
 	this->value = nullptr;
@@ -50,7 +51,7 @@ NodeValue::NodeValue(long double val) {
 	this->value = reinterpret_cast<void*> (new FloatNumber(val));
 }
 
-
+// internal methods
 std::string NodeValue::Represent() {
 	std::string res = "";
 
@@ -85,7 +86,8 @@ RunTimeResult* NodeValue::Add(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type")
+			std::string("Undefined value type"),
+			this->context
 		));
 	}
 }
@@ -103,7 +105,8 @@ RunTimeResult* NodeValue::Sub(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type")
+			std::string("Undefined value type"),
+			this->context
 		));
 	}
 }
@@ -121,7 +124,8 @@ RunTimeResult* NodeValue::Mult(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type")
+			std::string("Undefined value type"),
+			this->context
 		));
 	}
 }
@@ -139,11 +143,13 @@ RunTimeResult* NodeValue::Div(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type")
+			std::string("Undefined value type"),
+			this->context
 		));
 	}
 }
 
+// static utils
 NodeValue* NodeValue::CastToType(NodeValue* val, value_t cast_type) {
 	if (cast_type == INT_VALUE) {
 		if (val->type == INT_VALUE) return val;

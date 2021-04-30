@@ -6,8 +6,10 @@
 
 
 /*--- IntNumber ---------------------------------------*/
+// constructors
 IntNumber::IntNumber(long long val) : value(val) {}
 
+// operations
 // addition
 NodeValue* IntNumber::Add(NodeValue* other) {
 	if (other->type == INT_VALUE) {
@@ -23,7 +25,6 @@ NodeValue* IntNumber::Add(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
 // subtraction
 NodeValue* IntNumber::Sub(NodeValue* other) {
 	if (other->type == INT_VALUE) {
@@ -39,8 +40,6 @@ NodeValue* IntNumber::Sub(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
-
 // multiplication
 NodeValue* IntNumber::Mult(NodeValue* other) {
 	if (other->type == INT_VALUE) {
@@ -56,8 +55,6 @@ NodeValue* IntNumber::Mult(NodeValue* other) {
 		return new NodeValue(res);
 	}
 }
-
-
 // division
 NodeValue* IntNumber::Div(NodeValue* other) {
 	if (other->type == INT_VALUE) {

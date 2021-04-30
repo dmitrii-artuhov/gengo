@@ -12,11 +12,20 @@ Error::Error(const std::string& error_name, std::string& details) :
 	error_name(error_name), details(details) {}
 
 
+Error::Error(const std::string& error_name, std::string& details, Context* ctx) :
+	error_name(error_name), details(details), context(ctx) {}
+
+
 
 std::string Error::As_string() {
 	std::string res = "";
-	
-	{
+
+	if (this->error_name == ERROR_RUNTIME) {
+		res += this->Traceback();
+		res += this->error_name + ":" + this->details;
+		res += "\n";
+	}
+	else {
 		res += this->error_name + ":" + this->details;
 		res += "\n";
 
@@ -27,6 +36,20 @@ std::string Error::As_string() {
 			+ std::to_string((this->pos_start.index + 1));
 		res += "\n";
 	}
-
+	
 	return res;
 };
+
+
+std::string Error::Traceback() {
+	std::string res = "";
+
+	Context* curr_ctx = this->context;
+
+	while (curr_ctx) {
+		res = std::string("File " + curr_ctx->name + "\n") + res;
+		curr_ctx = curr_ctx->parent;
+	}
+
+	return std::string("Calls trace: \n") + res;
+}

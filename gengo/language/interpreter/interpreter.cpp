@@ -7,7 +7,6 @@
 
 
 /*--- Interpreter ---------------------------------------------*/
-
 RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	if (node->type == INT_NODE) {
 		this->RunTimeRes = this->VisitIntNode(node, context);
@@ -33,7 +32,8 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else {
 		this->RunTimeRes->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined node type")
+			std::string("Undefined node type"),
+			context
 		));
 	}
 
@@ -86,7 +86,8 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 	if (!var_stored) {
 		return res->Failure(new Error(
 			ERROR_RUNTIME,
-			std::string("'" + var_node->var_name + "' is not defined")
+			std::string("'" + var_node->var_name + "' is not defined"),
+			context
 		));
 	}
 
@@ -124,7 +125,8 @@ RunTimeResult* Interpreter::VisitVarAccessNode(ASTNode* node, Context* context) 
 		// Add context here
 		return res->Failure(new Error(
 			ERROR_RUNTIME,
-			std::string("'" + var_node->var_name + "' is not defined")
+			std::string("'" + var_node->var_name + "' is not defined"),
+			context
 		));
 	}
 
