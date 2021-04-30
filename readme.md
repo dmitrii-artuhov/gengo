@@ -12,7 +12,45 @@ factor  | INT\|FLOAT\|IDENTIFIER
 &nbsp;	| (PLUS\|MINUS) factor
 &nbsp;	| LPAREN expr RPAREN
 
+## Features (pre-release 0.2.0)
+- Initializing and using variables
+- Error messages
 
+## Snippets (variables)
+Initialization and assigning (supported types - `int`, `float`):
+
+```sh
+gengo > int a = 10
+10
+gengo > a = a - 11
+-1
+```
+
+```sh
+gengo > float b = 10
+10.000000
+gengo > b / 3
+3.333333
+```
+
+Initialization and assigning 'queue':
+```sh
+gengo > int t = int c = 10
+10
+gengo > t
+10
+gengo > c
+10
+```
+
+```sh
+gengo > int d = float b = 10
+10 - returns `d` as a result of operation
+gengo > d
+10
+gengo > b
+10.000000
+```
 
 ## Features (pre-release 0.1.0)
 - Supports arithmetic operations in  console
@@ -21,7 +59,7 @@ factor  | INT\|FLOAT\|IDENTIFIER
 - Auto int/float casting
 
 
-## Snippets
+## Snippets (arithmetic operations)
 Basic operations (`+`, `-`, `*`, `/`):
 
 ```sh
