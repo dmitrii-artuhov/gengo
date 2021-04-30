@@ -8,3 +8,6 @@
 #include <string>
 #include <unordered_map>
 #include <map>
+
+
+const bool GENGO_DEBUG = false;

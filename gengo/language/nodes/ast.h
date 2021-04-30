@@ -6,6 +6,7 @@ enum node_t {
     INT_NODE,
     FLOAT_NODE,
     VAR_ASSIGN_NODE,
+    VAR_REASSIGN_NODE,
     VAR_ACCESS_NODE,
     BINOP_NODE,
     UNOP_NODE,
@@ -39,7 +40,7 @@ public:
     ASTNode(Token &token);
     // variables
     ASTNode(Token& token, std::string &var_name, ASTNode* expr);
-
+    ASTNode(std::string &var_name, ASTNode* expr);
 
     // operators
     ASTNode(ASTNode* left, Token& token, ASTNode* right);
@@ -68,6 +69,7 @@ public:
 };
 
 /*--- Variables ---------------------------------------*/
+// Assign
 class VarAssignNode {
 private:
 public:
@@ -78,7 +80,17 @@ public:
     VarAssignNode(Token &token, std::string &var_name, ASTNode* expr);
     std::string Represent();
 };
+// Reassign
+class VarReassignNode {
+private:
+public:
+    std::string var_name;
+    ASTNode* expr;
 
+    VarReassignNode(std::string& var_name, ASTNode* expr);
+    std::string Represent();
+};
+// access
 class VarAccessNode {
 private:
 public:

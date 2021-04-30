@@ -42,6 +42,11 @@ ASTNode::ASTNode(Token &token, std::string &var_name, ASTNode* expr) {
     this->memory = reinterpret_cast<void*>(new VarAssignNode(token, var_name, expr));
 }
 
+ASTNode::ASTNode(std::string& var_name, ASTNode* expr) {
+    this->type = VAR_REASSIGN_NODE;
+    this->memory = reinterpret_cast<void*>(new VarReassignNode(var_name, expr));
+}
+
 
 // operators
 // binary
@@ -93,6 +98,10 @@ std::string ASTNode::Represent() {
         VarAssignNode* node = reinterpret_cast<VarAssignNode*>(this->memory);
         res += node->Represent();
     }
+    else if (this->type == VAR_REASSIGN_NODE) {
+        VarReassignNode* node = reinterpret_cast<VarReassignNode*>(this->memory);
+        res += node->Represent();
+    }
     else if (this->type == VAR_ACCESS_NODE) {
         VarAccessNode* node = reinterpret_cast<VarAccessNode*>(this->memory);
         res += node->Represent();
@@ -126,8 +135,10 @@ std::string FloatNode::Represent() {
 
 
 /*--- Variable Nodes ----------------------------------------*/
+// Assign
 VarAssignNode::VarAssignNode(Token& token, std::string& var_name, ASTNode* expr) :
 token(token), var_name(var_name), expr(expr) {}
+
 
 std::string VarAssignNode::Represent() {
     std::string res = "";
@@ -141,6 +152,22 @@ std::string VarAssignNode::Represent() {
 }
 
 
+// Reassign
+VarReassignNode::VarReassignNode(std::string& var_name, ASTNode* expr) :
+    var_name(var_name), expr(expr) {}
+
+std::string VarReassignNode::Represent() {
+    std::string res = "";
+    {
+        res += "(IDENTIFIER:" + this->var_name + ", ";
+        res += this->expr->Represent() + ")";
+    }
+
+    return res;
+}
+
+
+// Access
 VarAccessNode::VarAccessNode(Token& token) :
     token(token), var_name(token.value) {}
 

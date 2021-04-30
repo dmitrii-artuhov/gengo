@@ -34,6 +34,7 @@ public:
 	RunTimeResult* VisitFloatNode(ASTNode* node, Context* context);
 
 	RunTimeResult* VisitVarAssignNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitVarReassignNode(ASTNode* node, Context* context);
 	RunTimeResult* VisitVarAccessNode(ASTNode* node, Context* context);
 
 	RunTimeResult* VisitBinOpNode(ASTNode* node, Context* context);
@@ -82,6 +83,8 @@ public:
 	RunTimeResult* Sub(NodeValue* other);
 	RunTimeResult* Mult(NodeValue* other);
 	RunTimeResult* Div(NodeValue* other);
+
+	static NodeValue* CastToType(NodeValue* val, value_t cast_type);
 };
 
 class IntNumber {

@@ -162,7 +162,24 @@ ParseResult* Parser::Expr() {
 
 		return this->ParseRes->Success(new ASTNode(type_token, var_name, node));
 	}
+	else if (this->curr_token.type == TOKEN_IDENTIFIER && this->tokens[this->token_index + 1].type == TOKEN_EQ) {
+		// it is ok to put 'this->token_index + 1' because if current token is an indetifier then after it there will be at least TOKEN_EOF
+		// try variable reassignment
+		std::string var_name = this->curr_token.value;
+
+		this->Advance();
+		this->Advance(); // skip TOKEN_EQ (cuz we have already checked it in the condition)
+
+		ASTNode* node = this->ParseRes->Register(this->Expr());
+
+		if (this->ParseRes->error) {
+			return this->ParseRes;
+		}
+
+		return this->ParseRes->Success(new ASTNode(var_name, node)); // returns reassign node 
+	}
 	else {
+		// register a new Term
 		ASTNode* left = this->ParseRes->Register(this->Term());
 
 		if (this->curr_token.type != TOKEN_UNDEFINED) {

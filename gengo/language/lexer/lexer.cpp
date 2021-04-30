@@ -150,7 +150,7 @@ LexerResult* Lexer::MakeTokens() {
 	);
 
 	// DEBUG
-	if (0) 
+	if (GENGO_DEBUG)
 		for (Token t : tokens) {
 			std::cout << t.Represent() << std::endl;
 		}
