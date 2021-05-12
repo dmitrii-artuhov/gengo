@@ -10,4 +10,5 @@
 #include <map>
 
 
-const bool GENGO_DEBUG = false;
+const bool GENGO_DEBUG = !true;
+const bool GENGO_INTERPRET = true;

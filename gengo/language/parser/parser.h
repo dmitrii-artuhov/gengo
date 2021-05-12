@@ -21,9 +21,11 @@ public:
 
 	ParseResult* parse();
 
-	ParseResult* Factor();
-	ParseResult* Term();
 	ParseResult* Expr();
+	ParseResult* CompExpr();
+	ParseResult* ArithExpr();
+	ParseResult* Term();
+	ParseResult* Factor();
 };
 
 

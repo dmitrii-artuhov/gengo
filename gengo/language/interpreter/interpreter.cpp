@@ -166,6 +166,19 @@ RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
 	else if (t == TOKEN_DIV) {
 		return l_node->Div(r_node);
 	}
+	else if (t == TOKEN_AND) {
+		return l_node->AndedBy(r_node);
+	}
+	else if (t == TOKEN_OR) {
+		return l_node->OredBy(r_node);
+	}
+	else if (t == TOKEN_GT ||
+			t == TOKEN_GTE ||
+			t == TOKEN_LT  ||
+			t == TOKEN_LTE ||
+			t == TOKEN_EQEQ) {
+		return l_node->ComparedWith(curr_node->oper_token, r_node);
+	}
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
@@ -187,6 +200,9 @@ RunTimeResult* Interpreter::VisitUnOpNode(ASTNode* node, Context* context) {
 		NodeValue* oper_node = new NodeValue(-1LL);
 
 		return oper_node->Mult(r_node);
+	}
+	else if (curr_node->oper_token.type == TOKEN_NOT) {
+		return r_node->Notted();
 	}
 
 	return res->Success(r_node);

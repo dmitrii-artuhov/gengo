@@ -72,8 +72,65 @@ Token Lexer::MakeIdentifier() {
 	else if (find(KEYWORDS.begin(), KEYWORDS.end(), id_str) != KEYWORDS.end()) {
 		return Token(TOKEN_KEYWORD, pos_start, this->pos, id_str);
 	}
+	else if (id_str == "and") {
+		return Token(TOKEN_AND, pos_start, this->pos);
+	}
+	else if (id_str == "or") {
+		return Token(TOKEN_OR, pos_start, this->pos);
+	}
+	else if (id_str == "not") {
+		return Token(TOKEN_NOT, pos_start, this->pos);
+	}
 	else {
 		return Token(TOKEN_IDENTIFIER, pos_start, this->pos, id_str);
+	}
+}
+
+Token Lexer::MakeEquals() {
+	Position start_pos = this->pos.Copy();
+
+	// '=' here
+	this->Advance();
+	// search for second '='
+	if (this->curr_char == '=') {
+		return Token(TOKEN_EQEQ, start_pos, this->pos);
+	}
+	else {
+		this->pos = start_pos;
+		return Token(TOKEN_EQ, start_pos, start_pos);
+	}
+}
+
+Token Lexer::MakeGreaterEquals() {
+	Position start_pos = this->pos.Copy();
+
+	// '>' here
+	this->Advance();
+	// search for '='
+
+	if (this->curr_char == '=') {
+		return Token(TOKEN_GTE, start_pos, this->pos);
+	}
+	else {
+		this->pos = start_pos;
+		return Token(TOKEN_GT, start_pos, start_pos);
+	}
+}
+
+
+Token Lexer::MakeLessEquals() {
+	Position start_pos = this->pos.Copy();
+
+	// '<' here
+	this->Advance();
+	// search for '='
+
+	if (this->curr_char == '=') {
+		return Token(TOKEN_LTE, start_pos, this->pos);
+	}
+	else {
+		this->pos = start_pos;
+		return Token(TOKEN_LT, start_pos, start_pos);
 	}
 }
 
@@ -115,8 +172,21 @@ LexerResult* Lexer::MakeTokens() {
 			tokens.push_back(this->MakeIdentifier());
 		}
 		else if (this->curr_char == '=') {
-			// upgrade to find ==
-			tokens.push_back(Token(TOKEN_EQ, this->pos, this->pos));
+			Token token = this->MakeEquals(); // returns '=' or '=='
+
+			tokens.push_back(token);
+			this->Advance();
+		}
+		else if (this->curr_char == '>') {
+			Token token = this->MakeGreaterEquals(); // returns '>' or '>='
+
+			tokens.push_back(token);
+			this->Advance();
+		}
+		else if (this->curr_char == '<') {
+			Token token = this->MakeLessEquals(); // returns '<' or '<='
+
+			tokens.push_back(token);
 			this->Advance();
 		}
 		else {

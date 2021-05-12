@@ -1,5 +1,8 @@
 #pragma once
 
+
+#include "../../tokens/token.h"
+
 class NodeValue;
 
 class IntNumber {
@@ -20,4 +23,16 @@ public:
 
 	// division
 	NodeValue* Div(NodeValue* other);
+
+	// and
+	NodeValue* AndedBy(NodeValue* other);
+
+	// or
+	NodeValue* OredBy(NodeValue* other);
+
+	// not
+	NodeValue* Notted();
+
+	// and
+	NodeValue* ComparedWith(Token& oper_token, NodeValue* other);
 };

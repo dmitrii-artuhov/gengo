@@ -25,8 +25,12 @@ public:
 	void Advance();
 
 	// Helpers
-	Token MakeIdentifier();
+	Token MakeIdentifier(); // typedefine | variable | and | or | not
 	Token MakeNumberToken();
+	Token MakeEquals(); // '=' | '=='
+	Token MakeGreaterEquals(); // '>' | '>='
+	Token MakeLessEquals(); // '<' | '<='
+
 	
 	LexerResult* MakeTokens();
 };

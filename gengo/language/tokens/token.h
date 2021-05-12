@@ -13,10 +13,19 @@ TOKEN_MINUS = "MINUS",
 TOKEN_MULT = "MULT",
 TOKEN_DIV = "DIV",
 
+TOKEN_AND = "AND",
+TOKEN_OR = "OR",
+TOKEN_NOT = "NOT",
+
 TOKEN_LPAREN = "LPAREN",
 TOKEN_RPAREN = "RPAREN",
 
 TOKEN_EQ = "EQ",
+TOKEN_EQEQ = "EQEQ", // ==
+TOKEN_GT = "GT", // >
+TOKEN_GTE = "GTE", // >=
+TOKEN_LT = "LT", // <
+TOKEN_LTE = "LTE", // <=
 
 TOKEN_EOF = "EOF",
 
@@ -37,7 +46,7 @@ const std::vector <std::string> TYPES = {
 };
 
 const std::vector <std::string> KEYWORDS = {
-	
+
 };
 
 

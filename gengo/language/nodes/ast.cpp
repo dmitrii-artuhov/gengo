@@ -53,7 +53,19 @@ ASTNode::ASTNode(std::string& var_name, ASTNode* expr) {
 ASTNode::ASTNode(ASTNode* left, Token& token, ASTNode* right) {
     const std::string t = token.type;
 
-    if (t == TOKEN_PLUS || t == TOKEN_MINUS || t == TOKEN_DIV || t == TOKEN_MULT) {
+    if (t == TOKEN_PLUS    ||
+        t == TOKEN_MINUS   ||
+        t == TOKEN_DIV     ||
+        t == TOKEN_MULT    ||
+
+        t == TOKEN_AND     ||
+        t == TOKEN_OR      ||
+        t == TOKEN_EQEQ    ||
+        t == TOKEN_GT      ||
+        t == TOKEN_GTE     ||
+        t == TOKEN_LT      ||
+        t == TOKEN_LTE     
+       ) {
         this->type = BINOP_NODE;
         this->memory = reinterpret_cast<void*>(new BinOpNode(left, token, right));
     }
@@ -67,7 +79,7 @@ ASTNode::ASTNode(ASTNode* left, Token& token, ASTNode* right) {
 ASTNode::ASTNode(Token& token, ASTNode* node) {
     const std::string t = token.type;
 
-    if (t == TOKEN_PLUS || t == TOKEN_MINUS) {
+    if (t == TOKEN_PLUS || t == TOKEN_MINUS || t == TOKEN_NOT) {
         this->type = UNOP_NODE;
         this->memory = reinterpret_cast<void*>(new UnOpNode(token, node));
     }

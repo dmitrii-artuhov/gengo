@@ -3,10 +3,11 @@
 #include "../types.h"
 #include "../node/node.h"
 #include "../int/int.h"
+#include "../../tokens/token.h"
 
 
 
-
+class NodeValue;
 
 /*--- FloatNumber ---------------------------------------*/
 // constructors
@@ -86,3 +87,58 @@ NodeValue* FloatNumber::Div(NodeValue* other) {
 	}
 }
 
+// and
+NodeValue* FloatNumber::AndedBy(NodeValue* other) {
+	if (other->type == INT_VALUE) {
+		IntNumber* neigh = reinterpret_cast<IntNumber*>(other->value);
+
+		long long res = this->value && neigh->value;
+		return new NodeValue(res);
+	}
+	else if (other->type == FLOAT_VALUE) {
+		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
+
+		long long res = this->value && neigh->value;
+		return new NodeValue(res);
+	}
+}
+
+// or
+NodeValue* FloatNumber::OredBy(NodeValue* other) {
+	if (other->type == INT_VALUE) {
+		IntNumber* neigh = reinterpret_cast<IntNumber*>(other->value);
+
+		long long res = this->value || neigh->value;
+		return new NodeValue(res);
+	}
+	else if (other->type == FLOAT_VALUE) {
+		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
+
+		long long res = this->value || neigh->value;
+		return new NodeValue(res);
+	}
+}
+
+// not
+NodeValue* FloatNumber::Notted() {
+	long long res = !(this->value);
+
+	return new NodeValue(res);
+}
+
+// and
+// fix this shit
+NodeValue* FloatNumber::ComparedWith(Token& oper_token, NodeValue* other) {
+	if (other->type == INT_VALUE) {
+		IntNumber* neigh = reinterpret_cast<IntNumber*>(other->value);
+
+		long long res = (long long)NodeValue::Compare(oper_token, this->value, neigh->value);
+		return new NodeValue(res);
+	}
+	else if (other->type == FLOAT_VALUE) {
+		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
+
+		long long res = (long long)NodeValue::Compare(oper_token, this->value, neigh->value);
+		return new NodeValue(res);
+	}
+}

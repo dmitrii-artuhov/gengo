@@ -1,9 +1,19 @@
-expr    : (KEYWORD:TYPE)? IDENTIFIER EQ expr
-		: term ((PLUS|MINUS) term)*
+#######################
+#   CURRENT VERSION   #
+#######################
 
-term    : factor ((MUL|DIV) factor)*
+expr		: (KEYWORD:TYPE)? IDENTIFIER EQ expr
+			: comp-expr
 
-factor  : INT|FLOAT|IDENTIFIER
-		: (PLUS|MINUS) factor
-		: LPAREN expr RPAREN
+comp-expr	: arith-expr ((AND|OR|EQEQ|GT|GTE|LT|LTE) arith-expr)*
+
+arith-expr	: term ((PLUS|MINUS) term)*
+
+term		: factor ((MUL|DIV) factor)*
+
+factor		: INT|FLOAT|IDENTIFIER
+			: (PLUS|MINUS) factor
+			: LPAREN comp-expr RPAREN
+			: NOT comp-expr
+
 

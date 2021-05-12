@@ -35,17 +35,20 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 			std::cout << parse_res->ast->Represent() << std::endl;
 
 			// Interpreter
-			Context* ctx = new Context(file_name, nullptr);
-			ctx->symbol_table = global_table;
+			if (GENGO_INTERPRET) {
+				Context* ctx = new Context(file_name, nullptr);
+				ctx->symbol_table = global_table;
 
-			Interpreter* interpreter = new Interpreter();
-			RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast, ctx);
+				Interpreter* interpreter = new Interpreter();
 
-			if (interpret_res->error) {
-				std::cout << interpret_res->error->As_string() << std::endl;
-			}
-			else {
-				std::cout << interpret_res->result->Represent() << std::endl;
+				RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast, ctx);
+
+				if (interpret_res->error) {
+					std::cout << interpret_res->error->As_string() << std::endl;
+				}
+				else {
+					std::cout << interpret_res->result->Represent() << std::endl;
+				}
 			}
 		}
 	}

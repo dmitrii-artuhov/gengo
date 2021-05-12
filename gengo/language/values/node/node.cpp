@@ -149,6 +149,87 @@ RunTimeResult* NodeValue::Div(NodeValue* other) {
 	}
 }
 
+
+RunTimeResult* NodeValue::AndedBy(NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult();
+
+	if (this->type == INT_VALUE) {
+		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
+		return res->Success(curr->AndedBy(other));
+	}
+	else if (this->type == FLOAT_VALUE) {
+		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
+		return res->Success(curr->AndedBy(other));
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type"),
+			this->context
+		));
+	}
+}
+
+RunTimeResult* NodeValue::OredBy(NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult();
+
+	if (this->type == INT_VALUE) {
+		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
+		return res->Success(curr->OredBy(other));
+	}
+	else if (this->type == FLOAT_VALUE) {
+		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
+		return res->Success(curr->OredBy(other));
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type"),
+			this->context
+		));
+	}
+}
+
+RunTimeResult* NodeValue::Notted() {
+	RunTimeResult* res = new RunTimeResult();
+
+	if (this->type == INT_VALUE) {
+		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
+		return res->Success(curr->Notted());
+	}
+	else if (this->type == FLOAT_VALUE) {
+		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
+		return res->Success(curr->Notted());
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type"),
+			this->context
+		));
+	}
+}
+
+RunTimeResult* NodeValue::ComparedWith(Token& oper_token, NodeValue* other) {
+	RunTimeResult* res = new RunTimeResult;
+
+	if (this->type == INT_VALUE) {
+		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
+		return res->Success(curr->ComparedWith(oper_token, other));
+	}
+	else if (this->type == FLOAT_VALUE) {
+		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
+		return res->Success(curr->ComparedWith(oper_token, other));
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("Undefined value type"),
+			this->context
+		));
+	}
+}
+
 // static utils
 NodeValue* NodeValue::CastToType(NodeValue* val, value_t cast_type) {
 	if (cast_type == INT_VALUE) {
