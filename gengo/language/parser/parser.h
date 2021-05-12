@@ -21,6 +21,7 @@ public:
 
 	ParseResult* parse();
 
+	ParseResult* Statements();
 	ParseResult* Expr();
 	ParseResult* CompExpr();
 	ParseResult* ArithExpr();

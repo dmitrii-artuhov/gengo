@@ -41,6 +41,9 @@ public:
 		if (oper_token.type == TOKEN_EQEQ) {
 			return a == b;
 		}
+		else if (oper_token.type == TOKEN_NE) {
+			return a != b;
+		}
 		else if (oper_token.type == TOKEN_GT) {
 			return a > b;
 		}

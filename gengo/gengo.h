@@ -10,5 +10,6 @@
 #include <map>
 
 
-const bool GENGO_DEBUG = !true;
+const bool GENGO_SHOW_TOKENS = !true;
+const bool GENGO_SHOW_AST = !true;
 const bool GENGO_INTERPRET = true;

@@ -117,7 +117,6 @@ Token Lexer::MakeGreaterEquals() {
 	}
 }
 
-
 Token Lexer::MakeLessEquals() {
 	Position start_pos = this->pos.Copy();
 
@@ -139,6 +138,10 @@ LexerResult* Lexer::MakeTokens() {
 
 	while (this->curr_char != NULL) {
 		if (this->curr_char == ' ' || this->curr_char == '\t') {
+			this->Advance();
+		}
+		else if (this->curr_char == ';') {
+			tokens.push_back(Token(TOKEN_NEWLINE, this->pos, this->pos));
 			this->Advance();
 		}
 		else if (DIGITS.find(this->curr_char) != std::string::npos) {
@@ -176,6 +179,25 @@ LexerResult* Lexer::MakeTokens() {
 
 			tokens.push_back(token);
 			this->Advance();
+		}
+		else if (this->curr_char == '!') {
+			Position pos_start = this->pos.Copy();
+
+			this->Advance();
+
+			if (this->curr_char != '=') {
+				tokens.clear();
+				this->LexResult = new LexerResult(
+					tokens,
+					new Error(ERROR_ILLEGAL_CHAR, std::string("After '!' expected '='"), pos_start, this->pos)
+				);
+
+				return this->LexResult;
+			}
+			else {
+				tokens.push_back(Token(TOKEN_NE, pos_start, this->pos));
+				this->Advance();
+			}
 		}
 		else if (this->curr_char == '>') {
 			Token token = this->MakeGreaterEquals(); // returns '>' or '>='
@@ -220,7 +242,7 @@ LexerResult* Lexer::MakeTokens() {
 	);
 
 	// DEBUG
-	if (GENGO_DEBUG)
+	if (GENGO_SHOW_TOKENS)
 		for (Token t : tokens) {
 			std::cout << t.Represent() << std::endl;
 		}

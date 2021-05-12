@@ -89,6 +89,11 @@ ASTNode::ASTNode(Token& token, ASTNode* node) {
     }
 }
 
+// statements
+ASTNode::ASTNode(std::vector <ASTNode*>& nodes) {
+    this->type = STATEMENTS_NODE;
+    this->memory = reinterpret_cast<void*>(new StatementsNode(nodes));
+}
 
 
 
@@ -124,6 +129,10 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == UNOP_NODE) {
         UnOpNode* node = reinterpret_cast<UnOpNode*>(this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == STATEMENTS_NODE) {
+        StatementsNode* node = reinterpret_cast<StatementsNode*> (this->memory);
         res += node->Represent();
     }
 
@@ -224,6 +233,27 @@ std::string UnOpNode::Represent() {
 
     return res;
 }
+
+
+/*--- Main Node --------------------------------------------------*/
+StatementsNode::StatementsNode(std::vector <ASTNode*>& nodes):
+    nodes(nodes) {}
+
+
+std::string StatementsNode::Represent() {
+    std::string res = "(";
+
+    for (int i = 0; i < this->nodes.size(); i++) {
+        ASTNode* node = this->nodes[i];
+
+        res += node->type + ": " + node->Represent();
+        if (i != this->nodes.size() - 1) res += ", ";
+    }
+    res += ")";
+    return res;
+}
+
+
 
 /*--- UndefinedNode ----------------------------------------------*/
 UndefinedNode::UndefinedNode(Token &token): token(token) {}

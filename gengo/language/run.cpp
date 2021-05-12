@@ -32,7 +32,9 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 			std::cout << parse_res->error->As_string() << std::endl;
 		}
 		else {
-			std::cout << parse_res->ast->Represent() << std::endl;
+			if (GENGO_SHOW_AST) {
+				std::cout << parse_res->ast->Represent() << std::endl;
+			}
 
 			// Interpreter
 			if (GENGO_INTERPRET) {

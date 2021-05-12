@@ -29,6 +29,9 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == UNOP_NODE) {
 		this->RunTimeRes = this->VisitUnOpNode(node, context);
 	}
+	else if (node->type == STATEMENTS_NODE) {
+		this->RunTimeRes = this->VisitStatementsNode(node, context);
+	}
 	else {
 		this->RunTimeRes->Failure(new Error(
 			ERROR_INTERNAL,
@@ -172,11 +175,12 @@ RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
 	else if (t == TOKEN_OR) {
 		return l_node->OredBy(r_node);
 	}
-	else if (t == TOKEN_GT ||
-			t == TOKEN_GTE ||
-			t == TOKEN_LT  ||
-			t == TOKEN_LTE ||
-			t == TOKEN_EQEQ) {
+	else if (t == TOKEN_GT  ||
+			t == TOKEN_GTE  ||
+			t == TOKEN_LT   ||
+			t == TOKEN_LTE  ||
+			t == TOKEN_EQEQ ||
+			t == TOKEN_NE) {
 		return l_node->ComparedWith(curr_node->oper_token, r_node);
 	}
 	else {
@@ -208,3 +212,20 @@ RunTimeResult* Interpreter::VisitUnOpNode(ASTNode* node, Context* context) {
 	return res->Success(r_node);
 }
 
+// Visit statements
+RunTimeResult* Interpreter::VisitStatementsNode(ASTNode* node, Context* context) {
+	StatementsNode* ast = reinterpret_cast<StatementsNode*> (node->memory);
+	std::vector <ASTNode*> nodes = ast->nodes;
+
+	RunTimeResult* res;
+
+	for (int i = 0; i < nodes.size(); i++) {
+		res = this->Visit(nodes[i], context);
+
+		if (res->error) {
+			return res;
+		}
+	}
+
+	return res;
+}

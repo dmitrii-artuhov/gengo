@@ -29,6 +29,8 @@ public:
 
 	RunTimeResult* VisitBinOpNode(ASTNode* node, Context* context);
 	RunTimeResult* VisitUnOpNode(ASTNode* node, Context* context);
+
+	RunTimeResult* VisitStatementsNode(ASTNode* node, Context* context);
 };
 
 

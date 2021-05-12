@@ -2,10 +2,12 @@
 #   CURRENT VERSION   #
 #######################
 
+statements	: expr NEWLINE (expr NEWLINE)*
+
 expr		: (KEYWORD:TYPE)? IDENTIFIER EQ expr
 			: comp-expr
 
-comp-expr	: arith-expr ((AND|OR|EQEQ|GT|GTE|LT|LTE) arith-expr)*
+comp-expr	: arith-expr ((AND|OR|EQEQ|NE|GT|GTE|LT|LTE) arith-expr)*
 
 arith-expr	: term ((PLUS|MINUS) term)*
 

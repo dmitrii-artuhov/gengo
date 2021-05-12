@@ -13,6 +13,8 @@ enum node_t {
     BINOP_NODE,
     UNOP_NODE,
 
+    STATEMENTS_NODE,
+
     UNDEFIND_NODE,
 };
 
@@ -31,6 +33,9 @@ class VarAccessNode;
 // Operators Nodes
 class BinOpNode;
 class UnOpNode;
+
+// Statements 
+class StatementsNode;
 
 /*--- Main Node --------------------------------------------------*/
 class ASTNode {
@@ -51,6 +56,9 @@ public:
     // operators
     ASTNode(ASTNode* left, Token& token, ASTNode* right);
     ASTNode(Token& token, ASTNode* node);
+
+    // statements
+    ASTNode(std::vector <ASTNode*>& nodes);
 
     std::string Represent();
 };
@@ -131,6 +139,19 @@ public:
     Token oper_token;
 
     UnOpNode(Token& oper_token, ASTNode *node);
+    std::string Represent();
+};
+
+
+
+/*--- Main Node --------------------------------------------------*/
+class StatementsNode {
+private:
+
+public:
+    std::vector <ASTNode*> nodes;
+
+    StatementsNode(std::vector <ASTNode*>& nodes);
     std::string Represent();
 };
 

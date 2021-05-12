@@ -29,7 +29,8 @@ void Parser::Advance() {
 
 
 ParseResult* Parser::parse() {
-	this->ParseRes = this->Expr();
+	// this->ParseRes = this->Expr();
+	this->ParseRes = this->Statements();
 
 	if (!this->ParseRes->error && this->curr_token.type != TOKEN_EOF) {
 		return this->ParseRes->Failure(new Error(
@@ -42,6 +43,73 @@ ParseResult* Parser::parse() {
 
 	return this->ParseRes;
 }
+
+ParseResult* Parser::Statements() {
+	std::vector <ASTNode*> statements;
+
+	while (this->curr_token.type != TOKEN_EOF) {
+		ASTNode* expr = this->ParseRes->Register(this->Expr());
+
+		if (this->ParseRes->error) {
+			return this->ParseRes;
+		}
+
+		if (this->curr_token.type != TOKEN_NEWLINE) {
+			return this->ParseRes->Failure(new Error(
+				ERROR_INVALID_SYNTAX,
+				std::string("Expected ';'"),
+				this->curr_token.pos_start,
+				this->curr_token.pos_end
+			));
+		}
+
+		statements.push_back(expr);
+		this->Advance();
+	}
+
+	return this->ParseRes->Success(new ASTNode(statements));
+}
+
+/*
+res = ParseResult()
+statements = []
+pos_start = self.current_tok.pos_start.copy()
+
+while self.current_tok.type == TT_NEWLINE:
+	res.register_advancement()
+	self.advance()
+
+statement = res.register(self.expr())
+if res.error: return res
+statements.append(statement)
+
+more_statements = True
+
+while True:
+	newline_count = 0
+	while self.current_tok.type == TT_NEWLINE:
+	res.register_advancement()
+	self.advance()
+	newline_count += 1
+	if newline_count == 0:
+	more_statements = False
+
+	if not more_statements: break
+	statement = res.try_register(self.expr())
+	if not statement:
+		self.reverse(res.to_reverse_count)
+		more_statements = False
+		continue
+	statements.append(statement)
+
+return res.success(ListNode(
+	statements,
+	pos_start,
+	self.current_tok.pos_end.copy()
+))
+
+
+*/
 
 ParseResult* Parser::Expr() {
 	// KEYWORD:TYPE INDETIFIER EQ expr
@@ -118,6 +186,7 @@ ParseResult* Parser::CompExpr() {
 		while ( t == TOKEN_AND   ||
 			    t == TOKEN_OR    ||
 			    t == TOKEN_EQEQ  ||
+				t == TOKEN_NE	 ||
 				t == TOKEN_GT    ||
 				t == TOKEN_GTE   ||
 				t == TOKEN_LT    ||
