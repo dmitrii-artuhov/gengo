@@ -2,20 +2,28 @@
 #   CURRENT VERSION   #
 #######################
 
-statements	: expr NEWLINE (expr NEWLINE)*
+statements	    : expr NEWLINE (expr NEWLINE)*
 
-expr		: (KEYWORD:TYPE)? IDENTIFIER EQ expr
-			: comp-expr
+expr		    : (KEYWORD:TYPE)? IDENTIFIER EQ expr
+			    : comp-expr
 
-comp-expr	: arith-expr ((AND|OR|EQEQ|NE|GT|GTE|LT|LTE) arith-expr)*
+comp-expr	    : arith-expr ((AND|OR|EQEQ|NE|GT|GTE|LT|LTE) arith-expr)*
 
-arith-expr	: term ((PLUS|MINUS) term)*
+arith-expr	    : term ((PLUS|MINUS) term)*
 
-term		: factor ((MUL|DIV) factor)*
+term		    : factor ((MUL|DIV) factor)*
 
-factor		: INT|FLOAT|IDENTIFIER
-			: (PLUS|MINUS) factor
-			: LPAREN comp-expr RPAREN
-			: NOT comp-expr
+factor		    : INT|FLOAT|IDENTIFIER
+			    : (PLUS|MINUS) factor
+			    : LPAREN comp-expr RPAREN
+			    : NOT comp-expr
+				: if-expr
 
+if-expr         : KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
+                  (if-else-expr|else-expr)?
+              
+if-else-expr    : KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
+                  (if-else-expr|else-expr)?
+
+else-expr       : KEYWORD:otherwise LBRACE statements RBRACE
 

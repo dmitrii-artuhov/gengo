@@ -70,6 +70,20 @@ NodeValue* NodeValue::SetContext(Context* context) {
 	this->context = context;
 	return this;
 }
+bool NodeValue::IsTrue() {
+	if (this->type == INT_VALUE) {
+		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
+
+		if (curr->value == 0LL) return false;
+		else return true;
+	}
+	else if (this->type == FLOAT_VALUE) {
+		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
+
+		if (curr->value == (long double)0) return false;
+		else return true;
+	}
+}
 
 // operations
 RunTimeResult* NodeValue::Add(NodeValue* other) {

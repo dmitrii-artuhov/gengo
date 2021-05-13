@@ -14,6 +14,8 @@ enum node_t {
     UNOP_NODE,
 
     STATEMENTS_NODE,
+    
+    IF_NODE,
 
     UNDEFIND_NODE,
 };
@@ -37,6 +39,9 @@ class UnOpNode;
 // Statements 
 class StatementsNode;
 
+// If conditions
+class IfNode;
+
 /*--- Main Node --------------------------------------------------*/
 class ASTNode {
 private:
@@ -59,6 +64,9 @@ public:
 
     // statements
     ASTNode(std::vector <ASTNode*>& nodes);
+
+    // if conditions
+    ASTNode(std::vector <std::pair <ASTNode*, ASTNode*>> &cases, ASTNode* else_case);
 
     std::string Represent();
 };
@@ -152,6 +160,20 @@ public:
     std::vector <ASTNode*> nodes;
 
     StatementsNode(std::vector <ASTNode*>& nodes);
+    std::string Represent();
+};
+
+/*--- If conditions ---------------------------------------*/
+class IfNode {
+private:
+
+public:
+    std::vector <std::pair <ASTNode*, ASTNode*>> cases;
+    ASTNode* else_case;
+
+
+    IfNode(std::vector <std::pair <ASTNode*, ASTNode*>>& cases,
+                    ASTNode* else_case);
     std::string Represent();
 };
 

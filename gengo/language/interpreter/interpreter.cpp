@@ -32,8 +32,12 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == STATEMENTS_NODE) {
 		this->RunTimeRes = this->VisitStatementsNode(node, context);
 	}
+	else if (node->type == IF_NODE) {
+		this->RunTimeRes = this->VisitIfNode(node, context);
+	}
 	else {
-		this->RunTimeRes->Failure(new Error(
+		RunTimeResult* res = new RunTimeResult();
+		this->RunTimeRes = res->Failure(new Error(
 			ERROR_INTERNAL,
 			std::string("Undefined node type"),
 			context
@@ -69,10 +73,10 @@ RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) 
 	// casting variables to specified types
 	NodeValue* casted_val;
 
-	if (var_node->token.value == "int") {
+	if (var_node->token.value == TYPE_INT) {
 		casted_val = NodeValue::CastToType(val, INT_VALUE);
 	}
-	else if (var_node->token.value == "float") {
+	else if (var_node->token.value == TYPE_FLOAT) {
 		casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
 	}
 
@@ -115,7 +119,7 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 		return res;
 	}
 
-	context->symbol_table->Set(var_node->var_name, casted_val);
+	context->symbol_table->Reset(var_node->var_name, casted_val);
 	return res->Success(casted_val);
 }
 RunTimeResult* Interpreter::VisitVarAccessNode(ASTNode* node, Context* context) {
@@ -228,4 +232,37 @@ RunTimeResult* Interpreter::VisitStatementsNode(ASTNode* node, Context* context)
 	}
 
 	return res;
+}
+
+// Visite if nodes
+RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+	// set correct context 
+	Context* curr_context = new Context(std::string("<condition>"), context);
+	curr_context->symbol_table = new SymbolTable();
+	curr_context->symbol_table->parent = context->symbol_table;
+
+	IfNode* ast = reinterpret_cast<IfNode*> (node->memory);
+
+	for (std::pair <ASTNode*, ASTNode*> p : ast->cases) {
+		NodeValue* condition_value = res->Register(this->Visit(p.first, curr_context));
+		if (res->error)
+			return res;
+
+		if (condition_value->IsTrue()) {
+			NodeValue* expr_val = res->Register(this->Visit(p.second, curr_context));
+			if (res->error)
+				return res;
+			return res->Success(expr_val);
+		}
+	}
+
+	if (ast->else_case) {
+		NodeValue* expr_val = res->Register(this->Visit(ast->else_case, curr_context));
+		if (res->error)
+			return res;
+		return res->Success(expr_val);
+	}
+
+	return res->Success(NULL);
 }

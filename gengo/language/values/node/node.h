@@ -32,10 +32,10 @@ public:
 	RunTimeResult* Notted();
 	RunTimeResult* ComparedWith(Token& oper_token, NodeValue* other);
 
+	bool IsTrue();
 
 	static NodeValue* CastToType(NodeValue* val, value_t cast_type);
-	
-	// fix this shit
+
 	template <typename T, typename I>
 	static bool Compare(Token& oper_token, T& a, I& b) {
 		if (oper_token.type == TOKEN_EQEQ) {

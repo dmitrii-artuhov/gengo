@@ -27,6 +27,7 @@ public:
 	ParseResult* ArithExpr();
 	ParseResult* Term();
 	ParseResult* Factor();
+	ParseResult* IfExpr();
 };
 
 
@@ -43,6 +44,7 @@ public:
 	ParseResult* Failure(Error* err);
 	ParseResult* Success(ASTNode* ast);
 	ASTNode* Register(ParseResult* res);
+	ASTNode* TryRegister(ParseResult* res);
 };
 
 

@@ -64,6 +64,7 @@ ASTNode::ASTNode(ASTNode* left, Token& token, ASTNode* right) {
         t == TOKEN_GT      ||
         t == TOKEN_GTE     ||
         t == TOKEN_LT      ||
+        t == TOKEN_NE      ||
         t == TOKEN_LTE     
        ) {
         this->type = BINOP_NODE;
@@ -93,6 +94,13 @@ ASTNode::ASTNode(Token& token, ASTNode* node) {
 ASTNode::ASTNode(std::vector <ASTNode*>& nodes) {
     this->type = STATEMENTS_NODE;
     this->memory = reinterpret_cast<void*>(new StatementsNode(nodes));
+}
+
+
+// if conditions
+ASTNode::ASTNode(std::vector <std::pair <ASTNode*, ASTNode*>>& cases, ASTNode* else_case) {
+    this->type = IF_NODE;
+    this->memory = reinterpret_cast<void*>(new IfNode(cases, else_case));
 }
 
 
@@ -133,6 +141,10 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == STATEMENTS_NODE) {
         StatementsNode* node = reinterpret_cast<StatementsNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == IF_NODE) {
+        IfNode* node = reinterpret_cast<IfNode*> (this->memory);
         res += node->Represent();
     }
 
@@ -235,7 +247,7 @@ std::string UnOpNode::Represent() {
 }
 
 
-/*--- Main Node --------------------------------------------------*/
+/*--- Statements Node --------------------------------------------------*/
 StatementsNode::StatementsNode(std::vector <ASTNode*>& nodes):
     nodes(nodes) {}
 
@@ -246,14 +258,42 @@ std::string StatementsNode::Represent() {
     for (int i = 0; i < this->nodes.size(); i++) {
         ASTNode* node = this->nodes[i];
 
-        res += node->type + ": " + node->Represent();
+        res += "STATEMENT: " + node->Represent();
         if (i != this->nodes.size() - 1) res += ", ";
     }
     res += ")";
     return res;
 }
 
+/*--- If condition Node --------------------------------------------------*/
+IfNode::IfNode(std::vector <std::pair <ASTNode*, ASTNode*>>& cases,
+    ASTNode* else_case): cases(cases), else_case(else_case) {}
 
+std::string IfNode::Represent() {
+    std::string res = "(";
+
+
+    for (int i = 0; i < this->cases.size(); i++) {
+        ASTNode
+            *cond = this->cases[i].first,
+            *stms = this->cases[i].second;
+
+        res += "(CONDITION: ";
+        res += cond->Represent();
+        res += ", BODY: (";
+        res += stms->Represent();
+        res += ")";
+    }
+
+    if (else_case) {
+        res += "(ELSE-CONDITION: ";
+        res += else_case->Represent();
+        res += ")";
+    }
+
+    res += ")";
+    return res;
+}
 
 /*--- UndefinedNode ----------------------------------------------*/
 UndefinedNode::UndefinedNode(Token &token): token(token) {}

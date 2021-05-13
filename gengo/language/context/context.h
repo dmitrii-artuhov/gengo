@@ -17,6 +17,7 @@ public:
 
 	NodeValue* Get(std::string key);
 	void Set(std::string key, NodeValue* val);
+	void Reset(std::string key, NodeValue* val);
 	void Remove(std::string key);
 };
 

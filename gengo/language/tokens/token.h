@@ -2,6 +2,7 @@
 
 #include "./position.h"
 
+/*--- Tokens ----------------------------------------*/
 const std::string
 TOKEN_UNDEFINED = "UNDEFINED",
 
@@ -20,6 +21,9 @@ TOKEN_NOT = "NOT",
 TOKEN_LPAREN = "LPAREN",
 TOKEN_RPAREN = "RPAREN",
 
+TOKEN_LBRACE = "LBRACE", // {
+TOKEN_RBRACE = "RBRACE", // }
+
 TOKEN_EQ = "EQ",
 TOKEN_EQEQ = "EQEQ", // ==
 TOKEN_NE = "NE", // !=
@@ -36,18 +40,37 @@ TOKEN_KEYWORD = "KEYWORD",
 TOKEN_IDENTIFIER = "IDENTIFIER";
 
 
+/*--- Helpers -----------------------------------------------*/
 const std::string
 DIGITS = "0123456789",
 LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
+/*--- Language requirements ----------------------------------------------------------*/
+const std::string
+	TYPE_INT = "int",
+	TYPE_FLOAT = "float";
+
+const std::string
+	KEYWORD_AND = "and",
+	KEYWORD_OR = "or",
+	KEYWORD_NOT = "not",
+	KEYWORD_IF = "if",
+	KEYWORD_ELIF = "elif",
+	KEYWORD_ELSE = "otherwise";
+
 const std::vector <std::string> TYPES = {
-	"int",
-	"float"
+	TYPE_INT,
+	TYPE_FLOAT
 };
 
 const std::vector <std::string> KEYWORDS = {
-
+	KEYWORD_AND,
+	KEYWORD_OR,
+	KEYWORD_NOT,
+	KEYWORD_IF,
+	KEYWORD_ELIF,
+	KEYWORD_ELSE
 };
 
 

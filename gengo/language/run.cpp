@@ -48,7 +48,7 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 				if (interpret_res->error) {
 					std::cout << interpret_res->error->As_string() << std::endl;
 				}
-				else {
+				else if (interpret_res->result) {
 					std::cout << interpret_res->result->Represent() << std::endl;
 				}
 			}

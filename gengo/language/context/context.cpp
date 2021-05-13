@@ -22,6 +22,15 @@ void SymbolTable::Set(std::string key, NodeValue* val) {
 	this->table[key] = val;
 }
 
+void SymbolTable::Reset(std::string key, NodeValue* val) {
+	if (!this->table[key]) {
+		if (this->parent != nullptr)
+			this->parent->Reset(key, val);
+	}
+	else
+		this->table[key] = val;
+}
+
 
 void SymbolTable::Remove(std::string key) {
 	this->table.erase(key);

@@ -72,14 +72,14 @@ Token Lexer::MakeIdentifier() {
 	else if (find(KEYWORDS.begin(), KEYWORDS.end(), id_str) != KEYWORDS.end()) {
 		return Token(TOKEN_KEYWORD, pos_start, this->pos, id_str);
 	}
-	else if (id_str == "and") {
-		return Token(TOKEN_AND, pos_start, this->pos);
+	else if (id_str == KEYWORD_AND) {
+		return Token(TOKEN_AND, pos_start, this->pos, KEYWORD_AND);
 	}
-	else if (id_str == "or") {
-		return Token(TOKEN_OR, pos_start, this->pos);
+	else if (id_str == KEYWORD_OR) {
+		return Token(TOKEN_OR, pos_start, this->pos, KEYWORD_AND);
 	}
-	else if (id_str == "not") {
-		return Token(TOKEN_NOT, pos_start, this->pos);
+	else if (id_str == KEYWORD_NOT) {
+		return Token(TOKEN_NOT, pos_start, this->pos, KEYWORD_NOT);
 	}
 	else {
 		return Token(TOKEN_IDENTIFIER, pos_start, this->pos, id_str);
@@ -137,7 +137,7 @@ LexerResult* Lexer::MakeTokens() {
 	std::vector <Token> tokens;
 
 	while (this->curr_char != NULL) {
-		if (this->curr_char == ' ' || this->curr_char == '\t') {
+		if (this->curr_char == ' ' || this->curr_char == '\t' || this->curr_char == '\n') {
 			this->Advance();
 		}
 		else if (this->curr_char == ';') {
@@ -169,6 +169,14 @@ LexerResult* Lexer::MakeTokens() {
 		}
 		else if (this->curr_char == ')') {
 			tokens.push_back(Token(TOKEN_RPAREN, this->pos, this->pos));
+			this->Advance();
+		}
+		else if (this->curr_char == '{') {
+			tokens.push_back(Token(TOKEN_LBRACE, this->pos, this->pos));
+			this->Advance();
+		}
+		else if (this->curr_char == '}') {
+			tokens.push_back(Token(TOKEN_RBRACE, this->pos, this->pos));
 			this->Advance();
 		}
 		else if (std::string("_" + LETTERS).find(this->curr_char) != std::string::npos) {

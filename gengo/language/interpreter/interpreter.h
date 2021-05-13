@@ -31,6 +31,8 @@ public:
 	RunTimeResult* VisitUnOpNode(ASTNode* node, Context* context);
 
 	RunTimeResult* VisitStatementsNode(ASTNode* node, Context* context);
+	
+	RunTimeResult* VisitIfNode(ASTNode* node, Context* context);
 };
 
 
