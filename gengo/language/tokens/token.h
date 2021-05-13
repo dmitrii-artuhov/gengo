@@ -65,9 +65,6 @@ const std::vector <std::string> TYPES = {
 };
 
 const std::vector <std::string> KEYWORDS = {
-	KEYWORD_AND,
-	KEYWORD_OR,
-	KEYWORD_NOT,
 	KEYWORD_IF,
 	KEYWORD_ELIF,
 	KEYWORD_ELSE
