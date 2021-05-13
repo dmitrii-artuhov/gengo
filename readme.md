@@ -5,12 +5,59 @@
 ## Language Grammar
 Language Entity | Ruleset
 ------------ | -------------
-expr    | (KEYWORD:TYPE)? IDENTIFIER EQ expr
-&nbsp; 	| term ((PLUS\|MINUS) term)*
-term    | factor ((MUL\|DIV) factor)*
-factor  | INT\|FLOAT\|IDENTIFIER
-&nbsp;	| (PLUS\|MINUS) factor
-&nbsp;	| LPAREN expr RPAREN
+statements	 | expr NEWLINE (expr NEWLINE)*
+expr		 | (KEYWORD:TYPE)? IDENTIFIER EQ expr
+&nbsp; 		 | comp-expr
+comp-expr	 | arith-expr ((AND\|OR\|EQEQ\|NE\|GT\|GTE\|LT\|LTE) arith-expr)*
+arith-expr	 | term ((PLUS\|MINUS) term)*
+term		 | factor ((MUL\|DIV) factor)*
+factor		 | INT\|FLOAT\|IDENTIFIER
+&nbsp;		 | (PLUS\|MINUS) factor
+&nbsp;		 | LPAREN comp-expr RPAREN
+&nbsp;		 | NOT comp-expr
+&nbsp;		 | if-expr
+if-expr		 | KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
+&nbsp;		 | (if-else-expr\|else-expr)?
+if-else-expr | KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
+&nbsp;		 | (if-else-expr\|else-expr)?
+else-expr	 | KEYWORD:otherwise LBRACE statements RBRACE
+
+## Features (pre-release 0.3.0)
+- Comparison expressions
+- Conditions (with correct scope management)
+
+## Snippets (comparisons, conditions)
+Simple comparisons:
+
+```sh
+gengo > 1 > 0;
+1
+gengo > 100 != 99 + 1 - 1;
+1
+```
+
+Variables included
+```sh
+gengo > int a = 10; int b = 11;
+11 - returns `b` (last statement) as a result of operation
+gengo > a <= b;
+1
+```
+
+Conditions (returns last statement result):
+```sh
+gengo > int a = 10;
+10
+gengo > if (a == 10) { a = 11; } elif (a == 11) { a = 12; } otherwise { a = 10; };
+11
+gengo > if (a == 10) { a = 11; } elif (a == 11) { a = 12; } otherwise { a = 10; };
+12
+gengo > if (a == 10) { a = 11; } elif (a == 11) { a = 12; } otherwise { a = 10; };
+10
+gengo > a;
+10
+```
+
 
 ## Features (pre-release 0.2.0)
 - Initializing and using variables
