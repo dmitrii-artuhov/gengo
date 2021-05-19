@@ -2,6 +2,13 @@
 
 #include "../tokens/token.h"
 
+// ast-nodes
+#include "./ast_types/types.h"
+#include "./ast_vars/vars.h"
+#include "./ast_opers/opers.h"
+#include "./ast_if/if.h"
+#include "./ast_statements/statements.h"
+
 enum node_t {
     INT_NODE,
     FLOAT_NODE,
@@ -71,111 +78,6 @@ public:
     std::string Represent();
 };
 
-/*--- Type Nodes ---------------------------------------*/
-// Integer Node
-class IntNode {
-private:
-public:
-    Token token;
-    IntNode(Token &token);
-    std::string Represent();
-};
-
-// Float Node
-class FloatNode {
-private:
-public:
-    Token token;
-    FloatNode(Token &token);
-    std::string Represent();
-};
-
-/*--- Variables ---------------------------------------*/
-// Assign
-class VarAssignNode {
-private:
-public:
-    Token token; // { TOKEN_TYPE, int|float }
-    std::string var_name; // name
-    ASTNode* expr;
-
-    VarAssignNode(Token &token, std::string &var_name, ASTNode* expr);
-    std::string Represent();
-};
-// Reassign
-class VarReassignNode {
-private:
-public:
-    std::string var_name;
-    ASTNode* expr;
-
-    VarReassignNode(std::string& var_name, ASTNode* expr);
-    std::string Represent();
-};
-// access
-class VarAccessNode {
-private:
-public:
-    Token token; // { TOKEN_INDETIFIER, var_name }
-    std::string var_name; // name
-
-    VarAccessNode(Token& token);
-    std::string Represent();
-};
-
-
-
-/*--- Operation Nodes ---------------------------------------*/
-// Binary Operator
-class BinOpNode {
-private:
-
-public:
-    ASTNode *left, *right;
-    Token oper_token;
-
-    BinOpNode(ASTNode* left, Token &oper_token, ASTNode* right);
-    std::string Represent();
-};
-
-// Unary Operator
-class UnOpNode {
-private:
-
-public:
-    ASTNode *node;
-    Token oper_token;
-
-    UnOpNode(Token& oper_token, ASTNode *node);
-    std::string Represent();
-};
-
-
-
-/*--- Main Node --------------------------------------------------*/
-class StatementsNode {
-private:
-
-public:
-    std::vector <ASTNode*> nodes;
-
-    StatementsNode(std::vector <ASTNode*>& nodes);
-    std::string Represent();
-};
-
-/*--- If conditions ---------------------------------------*/
-class IfNode {
-private:
-
-public:
-    std::vector <std::pair <ASTNode*, ASTNode*>> cases;
-    ASTNode* else_case;
-
-
-    IfNode(std::vector <std::pair <ASTNode*, ASTNode*>>& cases,
-                    ASTNode* else_case);
-    std::string Represent();
-};
 
 
 /*--- Undefined Node ---------------------------------------*/

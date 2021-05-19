@@ -2,6 +2,12 @@
 #include "../tokens/token.h"
 #include "../nodes/ast.h"
 
+// ast-nodes
+#include "./ast_types/types.h"
+#include "./ast_vars/vars.h"
+#include "./ast_opers/opers.h"
+#include "./ast_if/if.h"
+#include "./ast_statements/statements.h"
 
 
 
@@ -148,150 +154,6 @@ std::string ASTNode::Represent() {
         res += node->Represent();
     }
 
-    return res;
-}
-
-/*--- Type Nodes ---------------------------------------*/
-// Integer Node
-IntNode::IntNode(Token& token) : token(token) {}
-
-std::string IntNode::Represent() {
-    return this->token.Represent();
-}
-
-// Float Node
-FloatNode::FloatNode(Token& token): token(token) {}
-
-std::string FloatNode::Represent() {
-    return this->token.Represent();
-}
-
-
-/*--- Variable Nodes ----------------------------------------*/
-// Assign
-VarAssignNode::VarAssignNode(Token& token, std::string& var_name, ASTNode* expr) :
-token(token), var_name(var_name), expr(expr) {}
-
-
-std::string VarAssignNode::Represent() {
-    std::string res = "";
-    {
-        res += "(" + this->token.Represent() + ", ";
-        res += "IDENTIFIER:" + this->var_name + ", ";
-        res += this->expr->Represent() + ")";
-    }
-
-    return res;
-}
-
-
-// Reassign
-VarReassignNode::VarReassignNode(std::string& var_name, ASTNode* expr) :
-    var_name(var_name), expr(expr) {}
-
-std::string VarReassignNode::Represent() {
-    std::string res = "";
-    {
-        res += "(IDENTIFIER:" + this->var_name + ", ";
-        res += this->expr->Represent() + ")";
-    }
-
-    return res;
-}
-
-
-// Access
-VarAccessNode::VarAccessNode(Token& token) :
-    token(token), var_name(token.value) {}
-
-std::string VarAccessNode::Represent() {
-    std::string res = "";
-    {
-        res += "(" + this->token.Represent() + ")";
-    }
-
-    return res;
-}
-
-
-/*--- Operation Nodes ---------------------------------------*/
-// Binary Operator
-BinOpNode::BinOpNode(ASTNode* left, Token& oper_token, ASTNode* right) :
-    left(left), right(right), oper_token(oper_token) {}
-
-
-std::string BinOpNode::Represent() {
-    std::string res = "";
-    {
-        res += "(" + this->left->Represent() + ", ";
-        res += this->oper_token.type + ", ";
-        res += this->right->Represent() + ")";
-    }
-
-    return res;
-}
-
-// Unary Operator
-UnOpNode::UnOpNode(Token& oper_token, ASTNode *node) :
-    node(node), oper_token(oper_token) {}
-
-
-std::string UnOpNode::Represent() {
-    std::string res = "";
-    {
-        res += "(" + this->oper_token.type + ", ";
-        res += this->node->Represent() + ")";
-    }
-
-    return res;
-}
-
-
-/*--- Statements Node --------------------------------------------------*/
-StatementsNode::StatementsNode(std::vector <ASTNode*>& nodes):
-    nodes(nodes) {}
-
-
-std::string StatementsNode::Represent() {
-    std::string res = "(";
-
-    for (int i = 0; i < this->nodes.size(); i++) {
-        ASTNode* node = this->nodes[i];
-
-        res += "STATEMENT: " + node->Represent();
-        if (i != this->nodes.size() - 1) res += ", ";
-    }
-    res += ")";
-    return res;
-}
-
-/*--- If condition Node --------------------------------------------------*/
-IfNode::IfNode(std::vector <std::pair <ASTNode*, ASTNode*>>& cases,
-    ASTNode* else_case): cases(cases), else_case(else_case) {}
-
-std::string IfNode::Represent() {
-    std::string res = "(";
-
-
-    for (int i = 0; i < this->cases.size(); i++) {
-        ASTNode
-            *cond = this->cases[i].first,
-            *stms = this->cases[i].second;
-
-        res += "(CONDITION: ";
-        res += cond->Represent();
-        res += ", BODY: (";
-        res += stms->Represent();
-        res += ")";
-    }
-
-    if (else_case) {
-        res += "(ELSE-CONDITION: ";
-        res += else_case->Represent();
-        res += ")";
-    }
-
-    res += ")";
     return res;
 }
 
