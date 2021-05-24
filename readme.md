@@ -16,6 +16,7 @@ factor		 | INT\|FLOAT\|IDENTIFIER
 &nbsp;		 | LPAREN comp-expr RPAREN
 &nbsp;		 | NOT comp-expr
 &nbsp;		 | if-expr
+&nbsp;		 | for-expr
 if-expr		 | KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
 &nbsp;		 | (if-else-expr\|else-expr)?
 if-else-expr | KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
