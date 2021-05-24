@@ -28,6 +28,7 @@ public:
 	ParseResult* Term();
 	ParseResult* Factor();
 	ParseResult* IfExpr();
+	ParseResult* ForExpr();
 };
 
 

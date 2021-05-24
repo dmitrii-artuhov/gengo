@@ -8,6 +8,7 @@
 #include "./ast_opers/opers.h"
 #include "./ast_if/if.h"
 #include "./ast_statements/statements.h"
+#include "./ast_for/for.h"
 
 
 
@@ -110,6 +111,12 @@ ASTNode::ASTNode(std::vector <std::pair <ASTNode*, ASTNode*>>& cases, ASTNode* e
 }
 
 
+// for nodes
+ASTNode::ASTNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body) {
+    this->type = FOR_NODE;
+    this->memory = reinterpret_cast <void*>(new ForNode(init, cond, inc, body));
+}
+
 
 
 
@@ -151,6 +158,10 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == IF_NODE) {
         IfNode* node = reinterpret_cast<IfNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == FOR_NODE) {
+        ForNode* node = reinterpret_cast<ForNode*> (this->memory);
         res += node->Represent();
     }
 

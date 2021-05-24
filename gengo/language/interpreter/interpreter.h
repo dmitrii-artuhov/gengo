@@ -33,6 +33,7 @@ public:
 	RunTimeResult* VisitStatementsNode(ASTNode* node, Context* context);
 	
 	RunTimeResult* VisitIfNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitForNode(ASTNode* node, Context* context);
 };
 
 

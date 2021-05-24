@@ -276,6 +276,14 @@ ParseResult* Parser::Factor() {
 		else
 			return res->Success(ifExpr);
 	}
+	else if (this->curr_token.type == TOKEN_KEYWORD && this->curr_token.value == KEYWORD_FOR) {
+		ASTNode* forExpr = res->Register(this->ForExpr());
+
+		if (res->error)
+			return res;
+		else
+			return res->Success(forExpr);
+	}
 	else if (this->curr_token.type == TOKEN_LPAREN) {
 		this->Advance();
 		node = res->Register(this->Expr());
@@ -487,7 +495,123 @@ ParseResult* Parser::IfExpr() {
 	return res->Success(new ASTNode(cases, else_case));
 }
 
+ParseResult* Parser::ForExpr() {
+	ParseResult* res = new ParseResult();
 
+	ASTNode *initialization = nullptr,
+			*condition = nullptr,
+			*increment = nullptr,
+			*body = nullptr;
+
+	if (this->curr_token.value != KEYWORD_FOR) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '" + KEYWORD_FOR + "'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	// META
+
+	if (this->curr_token.type != TOKEN_LPAREN) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '(' after '" + KEYWORD_FOR + "'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+	
+	if (this->curr_token.type != TOKEN_NEWLINE) {
+		initialization = res->Register(this->Expr());
+
+		if (res->error)
+			return res;
+	}
+
+	if (this->curr_token.type != TOKEN_NEWLINE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected ';'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	condition = res->Register(this->Expr());
+
+	if (res->error)
+		return res;
+
+	if (this->curr_token.type != TOKEN_NEWLINE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected ';'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	if (this->curr_token.type != TOKEN_RPAREN) {
+		increment = res->Register(this->Expr());
+
+		if (res->error)
+			return res;
+	}
+
+	if (this->curr_token.type != TOKEN_RPAREN) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected ')' at the end of loop parenthesis"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+
+	// BODY
+
+	if (this->curr_token.type != TOKEN_LBRACE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '{' before loop body"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+	body = res->Register(this->Statements());
+
+	if (res->error)
+		return res;
+
+	if (this->curr_token.type != TOKEN_RBRACE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '}' after loop body"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+
+	// initialization, condition, increment, body
+	return res->Success(new ASTNode(initialization, condition, increment, body));
+}
 
 
 /*--- ParseResult -----------------------------------------*/

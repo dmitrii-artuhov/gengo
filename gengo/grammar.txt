@@ -18,6 +18,7 @@ factor		    : INT|FLOAT|IDENTIFIER
 			    : LPAREN comp-expr RPAREN
 			    : NOT comp-expr
 				: if-expr
+				: for-expr
 
 if-expr         : KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
                   (if-else-expr|else-expr)?
@@ -26,4 +27,7 @@ if-else-expr    : KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
                   (if-else-expr|else-expr)?
 
 else-expr       : KEYWORD:otherwise LBRACE statements RBRACE
+
+for-expr		: KEYWORD:loop LPAREN (expr)? NEWLINE expr NEWLINE (expr)? RPAREN
+				  LBRACE statements RBRACE
 

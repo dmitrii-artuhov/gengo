@@ -7,6 +7,7 @@
 #include "./ast_vars/vars.h"
 #include "./ast_opers/opers.h"
 #include "./ast_if/if.h"
+#include "./ast_for/for.h"
 #include "./ast_statements/statements.h"
 
 enum node_t {
@@ -23,6 +24,8 @@ enum node_t {
     STATEMENTS_NODE,
     
     IF_NODE,
+
+    FOR_NODE,
 
     UNDEFIND_NODE,
 };
@@ -49,6 +52,9 @@ class StatementsNode;
 // If conditions
 class IfNode;
 
+// For Node
+class ForNode;
+
 /*--- Main Node --------------------------------------------------*/
 class ASTNode {
 private:
@@ -74,6 +80,9 @@ public:
 
     // if conditions
     ASTNode(std::vector <std::pair <ASTNode*, ASTNode*>> &cases, ASTNode* else_case);
+
+    // for nodes
+    ASTNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body);
 
     std::string Represent();
 };

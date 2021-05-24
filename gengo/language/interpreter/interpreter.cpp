@@ -35,6 +35,9 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == IF_NODE) {
 		this->RunTimeRes = this->VisitIfNode(node, context);
 	}
+	else if (node->type == FOR_NODE) {
+		this->RunTimeRes = this->VisitForNode(node, context);
+	}
 	else {
 		RunTimeResult* res = new RunTimeResult();
 		this->RunTimeRes = res->Failure(new Error(
@@ -150,14 +153,14 @@ RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 
 	NodeValue*  l_node = res->Register(this->Visit(curr_node->left, context));
-	if (this->RunTimeRes->error) {
-		return this->RunTimeRes;
+	if (res->error) {
+		return res;
 	}
 
 	NodeValue* r_node = res->Register(this->Visit(curr_node->right, context));
 
-	if (this->RunTimeRes->error) {
-		return this->RunTimeRes;
+	if (res->error) {
+		return res;
 	}
 
 	std::string t = curr_node->oper_token.type;
@@ -221,7 +224,7 @@ RunTimeResult* Interpreter::VisitStatementsNode(ASTNode* node, Context* context)
 	StatementsNode* ast = reinterpret_cast<StatementsNode*> (node->memory);
 	std::vector <ASTNode*> nodes = ast->nodes;
 
-	RunTimeResult* res;
+	RunTimeResult* res = new RunTimeResult();
 
 	for (int i = 0; i < nodes.size(); i++) {
 		res = this->Visit(nodes[i], context);
@@ -234,7 +237,7 @@ RunTimeResult* Interpreter::VisitStatementsNode(ASTNode* node, Context* context)
 	return res;
 }
 
-// Visite if nodes
+// Visit if nodes
 RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 	// set correct context 
@@ -262,6 +265,53 @@ RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
 		if (res->error)
 			return res;
 		return res->Success(expr_val);
+	}
+
+	return res->Success(NULL);
+}
+
+
+// Visit for node
+RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+	// set correct context 
+	Context* curr_context = new Context(std::string("<loop>"), context);
+	curr_context->symbol_table = new SymbolTable();
+	curr_context->symbol_table->parent = context->symbol_table;
+
+	ForNode* ast = reinterpret_cast<ForNode*> (node->memory);
+
+	// initialization
+	NodeValue* init = nullptr;
+	if (ast->init != nullptr) {
+		init = res->Register(this->Visit(ast->init, curr_context));
+		if (res->error)
+			return res;
+	}
+
+	// condition 
+
+	NodeValue* cond = res->Register(this->Visit(ast->cond, curr_context));
+	if (res->error)
+		return res;
+
+	while (cond->IsTrue()) {
+		// increment
+		if (ast->inc != nullptr) {
+			res->Register(this->Visit(ast->inc, curr_context));
+			if (res->error)
+				return res;
+		}
+
+		res->Register(this->Visit(ast->body, curr_context));
+		if (res->error)
+			return res;
+
+		// condition - is not optimized well
+		// (figure out a better way of doing this)
+		cond = res->Register(this->Visit(ast->cond, curr_context));
+		if (res->error)
+			return res;
 	}
 
 	return res->Success(NULL);
