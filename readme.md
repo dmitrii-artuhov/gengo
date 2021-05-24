@@ -21,6 +21,22 @@ if-expr		 | KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
 if-else-expr | KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
 &nbsp;		 | (if-else-expr\|else-expr)?
 else-expr	 | KEYWORD:otherwise LBRACE statements RBRACE
+for-expr	 | KEYWORD:loop LPAREN (expr)? NEWLINE expr NEWLINE (expr)? RPAREN LBRACE statements RBRACE
+
+## Features (pre-release 0.4.0)
+- For loops (with correct scope management)
+
+## Snippets (loops)
+For-loop:
+
+```sh
+gengo > int a = 1;
+1
+gengo > loop(int i = 0; i < 10; i = i + 1){ a = a * 2; };
+gengo > a;
+gengo > 1024
+```
+
 
 ## Features (pre-release 0.3.0)
 - Comparison expressions
