@@ -27,6 +27,9 @@ enum node_t {
 
     FOR_NODE,
 
+    FUNC_DECL_NODE,
+    FUNC_CALL_NODE, 
+
     UNDEFIND_NODE,
 };
 
@@ -83,6 +86,9 @@ public:
 
     // for nodes
     ASTNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body);
+
+    // function nodes
+    ASTNode(std::string &func_name, std::vector <std::pair <std::string, Token*>> &args, Token* return_type, ASTNode* func_body);
 
     std::string Represent();
 };

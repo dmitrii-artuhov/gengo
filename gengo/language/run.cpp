@@ -22,7 +22,7 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 	if (lex_res->error) {
 		std::cout << lex_res->error->As_string() << std::endl;
 	}
-	else {
+	else if (GENGO_PARSE) {
 		// Parser
 		Parser* parser = new Parser(lex_res->tokens);
 

@@ -29,6 +29,7 @@ public:
 	ParseResult* Factor();
 	ParseResult* IfExpr();
 	ParseResult* ForExpr();
+	ParseResult* FuncDeclExpr();
 };
 
 

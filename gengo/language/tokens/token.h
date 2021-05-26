@@ -33,6 +33,9 @@ TOKEN_LT = "LT", // <
 TOKEN_LTE = "LTE", // <=
 
 TOKEN_NEWLINE = "NEWLINE", // ;
+TOKEN_COLON = "COLON", // :
+TOKEN_ARROW = "ARROW", // ->
+TOKEN_COMMA = "COMMA", // ,
 TOKEN_EOF = "EOF",
 
 TOKEN_TYPE = "TYPE",
@@ -55,10 +58,13 @@ const std::string
 	KEYWORD_AND = "and",
 	KEYWORD_OR = "or",
 	KEYWORD_NOT = "not",
+
 	KEYWORD_IF = "if",
 	KEYWORD_ELIF = "elif",
 	KEYWORD_ELSE = "otherwise",
-	KEYWORD_FOR = "loop"; // loop(initialization; condition; incrementation) {  };
+	KEYWORD_FOR = "loop", // loop(initialization; condition; incrementation) {  };
+	KEYWORD_FUNCTION = "function";
+
 
 const std::vector <std::string> TYPES = {
 	TYPE_INT,
@@ -69,7 +75,8 @@ const std::vector <std::string> KEYWORDS = {
 	KEYWORD_IF,
 	KEYWORD_ELIF,
 	KEYWORD_ELSE,
-	KEYWORD_FOR
+	KEYWORD_FOR,
+	KEYWORD_FUNCTION
 };
 
 

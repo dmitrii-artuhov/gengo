@@ -54,6 +54,7 @@ ParseResult* Parser::Statements() {
 		int idx = this->token_index;
 		ASTNode* expr = res->TryRegister(this->Expr());
 
+
 		if (!expr) {
 			this->curr_token = this->tokens[idx];
 			this->token_index = idx;
@@ -150,6 +151,9 @@ ParseResult* Parser::CompExpr() {
 	// register a new ArithExpr
 	ASTNode* left = res->Register(this->ArithExpr());
 
+	if (res->error)
+		return res;
+
 	if (this->curr_token.type != TOKEN_UNDEFINED) {
 		std::string t = this->curr_token.type;
 		while ( t == TOKEN_AND   ||
@@ -166,6 +170,9 @@ ParseResult* Parser::CompExpr() {
 			this->Advance();
 
 			ASTNode* right = res->Register(this->ArithExpr());
+
+			if (res->error)
+				return res;
 
 			left = new ASTNode(left, oper_token, right);
 			t = this->curr_token.type;
@@ -189,6 +196,9 @@ ParseResult* Parser::ArithExpr() {
 	// register a new Term
 	ASTNode* left = res->Register(this->Term());
 
+	if (res->error)
+		return res;
+
 	if (this->curr_token.type != TOKEN_UNDEFINED) {
 		std::string t = this->curr_token.type;
 		while (t == TOKEN_PLUS || t == TOKEN_MINUS) {
@@ -197,6 +207,9 @@ ParseResult* Parser::ArithExpr() {
 			this->Advance();
 
 			ASTNode* right = res->Register(this->Term());
+
+			if (res->error)
+				return res;
 
 			left = new ASTNode(left, oper_token, right);
 			t = this->curr_token.type;
@@ -218,6 +231,9 @@ ParseResult* Parser::Term() {
 	ParseResult* res = new ParseResult();
 
 	ASTNode* left = res->Register(this->Factor());
+
+	if (res->error)
+		return res;
 
 	if (this->curr_token.type != TOKEN_UNDEFINED) {
 		std::string t = this->curr_token.type;
@@ -283,6 +299,15 @@ ParseResult* Parser::Factor() {
 			return res;
 		else
 			return res->Success(forExpr);
+	}
+	else if (this->curr_token.type == TOKEN_KEYWORD && this->curr_token.value == KEYWORD_FUNCTION) {
+		// function definition
+		ASTNode* funcExpr = res->Register(this->FuncDeclExpr());
+
+		if (res->error)
+			return res;
+		else
+			return res->Success(funcExpr);
 	}
 	else if (this->curr_token.type == TOKEN_LPAREN) {
 		this->Advance();
@@ -613,6 +638,146 @@ ParseResult* Parser::ForExpr() {
 	return res->Success(new ASTNode(initialization, condition, increment, body));
 }
 
+ParseResult* Parser::FuncDeclExpr() {
+	ParseResult* res = new ParseResult();
+
+	if (this->curr_token.value != KEYWORD_FUNCTION) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '" + KEYWORD_FUNCTION + "'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	if (this->curr_token.type != TOKEN_IDENTIFIER) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected identifier as function name"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	std::string func_name = this->curr_token.value;
+
+	this->Advance();
+
+	if (this->curr_token.type != TOKEN_LPAREN) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '(' after a function name"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	std::vector <std::pair <std::string, Token*>> args; // { arg_name, arg_type }
+
+
+	while (this->curr_token.type == TOKEN_IDENTIFIER) {
+		std::string arg_name = this->curr_token.value;
+		this->Advance();
+		if (this->curr_token.type != TOKEN_COLON) {
+			return res->Failure(new Error(
+				ERROR_INVALID_SYNTAX,
+				std::string("Expected ':' after argument name"),
+				this->curr_token.pos_start,
+				this->curr_token.pos_end
+			));
+		}
+
+		this->Advance();
+
+		if (this->curr_token.type != TOKEN_TYPE) {
+			return res->Failure(new Error(
+				ERROR_INVALID_SYNTAX,
+				std::string("Expected valid argument type declaration"),
+				this->curr_token.pos_start,
+				this->curr_token.pos_end
+			));
+		}
+
+		Token* arg_type = this->curr_token.Copy();
+
+		args.push_back({ arg_name, arg_type });
+
+		this->Advance();
+
+		if (this->curr_token.type == TOKEN_COMMA)
+			this->Advance();
+	}
+
+	if (this->curr_token.type != TOKEN_RPAREN) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected ')'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	if (this->curr_token.type != TOKEN_ARROW) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '->' before return type declaration"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	if (this->curr_token.type != TOKEN_TYPE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected valid return type declaration"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	Token* return_type = this->curr_token.Copy();
+
+	this->Advance();
+
+	if (this->curr_token.type != TOKEN_LBRACE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '{' before function body"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	ASTNode* func_body = res->Register(this->Statements());
+
+	if (res->error)
+		return res;
+
+	if (this->curr_token.type != TOKEN_RBRACE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '}' after function body"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	// func_name, args, return_type, func_body
+	// string, vector <pair <string, Token*>>, Token*, ASTNode*
+	return res->Success(new ASTNode(func_name, args, return_type, func_body));
+}
 
 /*--- ParseResult -----------------------------------------*/
 ParseResult::ParseResult():

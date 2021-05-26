@@ -14,11 +14,17 @@ arith-expr	    : term ((PLUS|MINUS) term)*
 term		    : factor ((MUL|DIV) factor)*
 
 factor		    : INT|FLOAT|IDENTIFIER
+				: IDENTIFIER LPAREN (expr (COMMA expr)*)? RPAREN
 			    : (PLUS|MINUS) factor
 			    : LPAREN comp-expr RPAREN
 			    : NOT comp-expr
 				: if-expr
 				: for-expr
+				: func-def
+
+func-def		: KEYWORD:function IDENTIFIER LPAREN (IDENTIFIER COLON KEYWORD:TYPE
+				  (COMMA IDENTIFIER COLON KEYWORD:TYPE)*)? RPAREN ARROW KEYWORD:TYPE
+				  LBRACE statements RBRACE
 
 if-expr         : KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
                   (if-else-expr|else-expr)?

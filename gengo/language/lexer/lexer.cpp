@@ -151,9 +151,20 @@ LexerResult* Lexer::MakeTokens() {
 			tokens.push_back(Token(TOKEN_PLUS, this->pos, this->pos));
 			this->Advance();
 		}
-		else if (this->curr_char == '-') {
-			tokens.push_back(Token(TOKEN_MINUS, this->pos, this->pos));
+		else if (this->curr_char == '-') { // minus or arrow
+			Position start_pos = this->pos.Copy();
 			this->Advance();
+
+			// search for '>'
+			if (this->curr_char == '>') {
+				// arrow
+				tokens.push_back(Token(TOKEN_ARROW, start_pos, this->pos));
+				this->Advance();
+			}
+			else {
+				// minus
+				tokens.push_back(Token(TOKEN_MINUS, start_pos, start_pos));
+			}
 		}
 		else if (this->curr_char == '*') {
 			tokens.push_back(Token(TOKEN_MULT, this->pos, this->pos));
@@ -177,6 +188,14 @@ LexerResult* Lexer::MakeTokens() {
 		}
 		else if (this->curr_char == '}') {
 			tokens.push_back(Token(TOKEN_RBRACE, this->pos, this->pos));
+			this->Advance();
+		}
+		else if (this->curr_char == ',') {
+			tokens.push_back(Token(TOKEN_COMMA, this->pos, this->pos));
+			this->Advance();
+		}
+		else if (this->curr_char == ':') {
+			tokens.push_back(Token(TOKEN_COLON, this->pos, this->pos));
 			this->Advance();
 		}
 		else if (std::string("_" + LETTERS).find(this->curr_char) != std::string::npos) {

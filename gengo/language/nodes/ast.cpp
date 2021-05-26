@@ -9,6 +9,7 @@
 #include "./ast_if/if.h"
 #include "./ast_statements/statements.h"
 #include "./ast_for/for.h"
+#include "./ast_functions/func.h"
 
 
 
@@ -117,7 +118,11 @@ ASTNode::ASTNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body) {
     this->memory = reinterpret_cast <void*>(new ForNode(init, cond, inc, body));
 }
 
-
+// function nodes
+ASTNode::ASTNode(std::string &func_name, std::vector <std::pair <std::string, Token*>> &args, Token* return_type, ASTNode* func_body) {
+    this->type = FUNC_DECL_NODE;
+    this->memory = reinterpret_cast<void*>(new FuncDeclNode(func_name, args, return_type, func_body));
+}
 
 
 // methods
@@ -162,6 +167,10 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == FOR_NODE) {
         ForNode* node = reinterpret_cast<ForNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == FUNC_DECL_NODE) {
+        FuncDeclNode* node = reinterpret_cast<FuncDeclNode*> (this->memory);
         res += node->Represent();
     }
 
