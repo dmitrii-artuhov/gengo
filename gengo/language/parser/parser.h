@@ -22,6 +22,7 @@ public:
 	ParseResult* parse();
 
 	ParseResult* Statements();
+	ParseResult* Statement();
 	ParseResult* Expr();
 	ParseResult* CompExpr();
 	ParseResult* ArithExpr();
@@ -30,6 +31,7 @@ public:
 	ParseResult* IfExpr();
 	ParseResult* ForExpr();
 	ParseResult* FuncDeclExpr();
+	ParseResult* FuncCallExpr();
 };
 
 

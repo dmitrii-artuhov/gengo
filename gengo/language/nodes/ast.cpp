@@ -20,7 +20,6 @@ ASTNode::ASTNode() {
 	this->memory = nullptr;
 }
 
-
 // types
 ASTNode::ASTNode(Token &token) {
     const std::string t = token.type;
@@ -124,6 +123,15 @@ ASTNode::ASTNode(std::string &func_name, std::vector <std::pair <std::string, To
     this->memory = reinterpret_cast<void*>(new FuncDeclNode(func_name, args, return_type, func_body));
 }
 
+ASTNode::ASTNode(std::string& func_name, std::vector <Token*>& args) {
+    this->type = FUNC_CALL_NODE;
+    this->memory = reinterpret_cast<void*>(new FuncCallNode(func_name, args));
+}
+
+ASTNode::ASTNode(ASTNode* expr) {
+    this->type = RETURN_NODE;
+    this->memory = reinterpret_cast<void*>(new ReturnNode(expr));
+}
 
 // methods
 std::string ASTNode::Represent() {
@@ -171,6 +179,14 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == FUNC_DECL_NODE) {
         FuncDeclNode* node = reinterpret_cast<FuncDeclNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == FUNC_CALL_NODE) {
+        FuncCallNode* node = reinterpret_cast<FuncCallNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == RETURN_NODE) {
+        ReturnNode* node = reinterpret_cast<ReturnNode*> (this->memory);
         res += node->Represent();
     }
 

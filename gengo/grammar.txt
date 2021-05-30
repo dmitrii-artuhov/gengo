@@ -2,7 +2,10 @@
 #   CURRENT VERSION   #
 #######################
 
-statements	    : expr NEWLINE (expr NEWLINE)*
+statements	    : statement NEWLINE (statement NEWLINE)*
+
+statement		: expr
+				: KEYWORD:return expr
 
 expr		    : (KEYWORD:TYPE)? IDENTIFIER EQ expr
 			    : comp-expr

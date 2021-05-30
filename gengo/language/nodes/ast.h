@@ -29,34 +29,36 @@ enum node_t {
 
     FUNC_DECL_NODE,
     FUNC_CALL_NODE, 
+    RETURN_NODE,
 
     UNDEFIND_NODE,
 };
 
 
-// Main Node
-class ASTNode;
+//// Main Node
+//class ASTNode;
+//
+//// Type Nodes
+//class IntNode;
+//class FloatNode;
+//
+//// Variables
+//class VarAssignNode;
+//class VarAccessNode;
+//
+//// Operators Nodes
+//class BinOpNode;
+//class UnOpNode;
+//
+//// Statements 
+//class StatementsNode;
+//
+//// If conditions
+//class IfNode;
+//
+//// For Node
+//class ForNode;
 
-// Type Nodes
-class IntNode;
-class FloatNode;
-
-// Variables
-class VarAssignNode;
-class VarAccessNode;
-
-// Operators Nodes
-class BinOpNode;
-class UnOpNode;
-
-// Statements 
-class StatementsNode;
-
-// If conditions
-class IfNode;
-
-// For Node
-class ForNode;
 
 /*--- Main Node --------------------------------------------------*/
 class ASTNode {
@@ -89,6 +91,8 @@ public:
 
     // function nodes
     ASTNode(std::string &func_name, std::vector <std::pair <std::string, Token*>> &args, Token* return_type, ASTNode* func_body);
+    ASTNode(std::string &func_name, std::vector <Token*> &args);
+    ASTNode(ASTNode* expr); // return statement
 
     std::string Represent();
 };

@@ -63,7 +63,8 @@ const std::string
 	KEYWORD_ELIF = "elif",
 	KEYWORD_ELSE = "otherwise",
 	KEYWORD_FOR = "loop", // loop(initialization; condition; incrementation) {  };
-	KEYWORD_FUNCTION = "function";
+	KEYWORD_FUNCTION = "function",
+	KEYWORD_RETURN = "return";
 
 
 const std::vector <std::string> TYPES = {
@@ -76,7 +77,8 @@ const std::vector <std::string> KEYWORDS = {
 	KEYWORD_ELIF,
 	KEYWORD_ELSE,
 	KEYWORD_FOR,
-	KEYWORD_FUNCTION
+	KEYWORD_FUNCTION,
+	KEYWORD_RETURN
 };
 
 

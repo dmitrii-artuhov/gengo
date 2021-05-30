@@ -3,6 +3,9 @@
 #include "./func.h"
 #include "../ast.h"
 
+
+/*--- Function declaration ---------------------------------------*/
+
 FuncDeclNode::FuncDeclNode(std::string& func_name, std::vector <std::pair <std::string, Token*>> args, Token* return_type, ASTNode* func_body):
 	func_name(func_name), args(args), return_type(return_type), func_body(func_body) {}
 
@@ -14,11 +17,63 @@ std::string FuncDeclNode::Represent() {
 		+ "; RTYPE: " + this->return_type->value
 		+ "; ARGS: ";
 
-	for (std::pair <std::string, Token*> p : this->args) {
-		res += "(" + p.first + ", " + p.second->value + ") ";
+
+	for (int i = 0; i < this->args.size(); i++) {
+		std::pair <std::string, Token*> p = this->args[i];
+
+		res += "(" + p.first + ":" + p.second->value + ")";
+
+		if (i != this->args.size() - 1)
+			res += ", ";
 	}
 	
 	res += "; BODY: " + this->func_body->Represent();
 
+	res += "))";
+
 	return res;
 }
+
+
+/*--- Function Call ---------------------------------------*/
+FuncCallNode::FuncCallNode(std::string& func_name, std::vector <Token*> args) :
+	func_name(func_name), args(args) {}
+
+
+std::string FuncCallNode::Represent() {
+	std::string res = "(";
+
+	res += "FUNC: (NAME: " + this->func_name
+		+ "; ARGS: ";
+
+
+	for (int i = 0; i < this->args.size(); i++) {
+		Token* p = this->args[i];
+		
+		res += "(" + p->type + ":" + p->value + ")";
+
+		if (i != this->args.size() - 1)
+			res += ", ";
+	}
+
+	res += "))";
+
+	return res;
+}
+
+
+
+/*--- Return Node -----------------------------------------------*/
+ReturnNode::ReturnNode(ASTNode* expr) : expr(expr) {}
+
+std::string ReturnNode::Represent() {
+	std::string res = "(RETURN: (";
+
+	res += this->expr->Represent();
+
+	res += "))";
+
+	return res;
+}
+
+
