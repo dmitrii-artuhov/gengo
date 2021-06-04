@@ -34,6 +34,10 @@ public:
 	
 	RunTimeResult* VisitIfNode(ASTNode* node, Context* context);
 	RunTimeResult* VisitForNode(ASTNode* node, Context* context);
+
+	RunTimeResult* VisitFuncDeclNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitFuncCallNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitReturnNode(ASTNode* node, Context* context);
 };
 
 

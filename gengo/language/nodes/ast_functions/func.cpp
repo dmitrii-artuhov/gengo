@@ -36,7 +36,7 @@ std::string FuncDeclNode::Represent() {
 
 
 /*--- Function Call ---------------------------------------*/
-FuncCallNode::FuncCallNode(std::string& func_name, std::vector <Token*> args) :
+FuncCallNode::FuncCallNode(std::string& func_name, std::vector <ASTNode*> args) :
 	func_name(func_name), args(args) {}
 
 
@@ -48,9 +48,9 @@ std::string FuncCallNode::Represent() {
 
 
 	for (int i = 0; i < this->args.size(); i++) {
-		Token* p = this->args[i];
+		ASTNode* p = this->args[i];
 		
-		res += "(" + p->type + ":" + p->value + ")";
+		res += p->Represent();
 
 		if (i != this->args.size() - 1)
 			res += ", ";
@@ -60,7 +60,6 @@ std::string FuncCallNode::Represent() {
 
 	return res;
 }
-
 
 
 /*--- Return Node -----------------------------------------------*/

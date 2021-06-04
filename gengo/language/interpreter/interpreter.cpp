@@ -38,6 +38,15 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == FOR_NODE) {
 		this->RunTimeRes = this->VisitForNode(node, context);
 	}
+	else if (node->type == FUNC_DECL_NODE) {
+		this->RunTimeRes = this->VisitFuncDeclNode(node, context);
+	}
+	else if (node->type == FUNC_CALL_NODE) {
+		this->RunTimeRes = this->VisitFuncCallNode(node, context);
+	}
+	else if (node->type == RETURN_NODE) {
+		this->RunTimeRes = this->VisitReturnNode(node, context);
+	}
 	else {
 		RunTimeResult* res = new RunTimeResult();
 		this->RunTimeRes = res->Failure(new Error(
@@ -316,3 +325,84 @@ RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
 
 	return res->Success(NULL);
 }
+
+
+// Visit functions
+RunTimeResult* Interpreter::VisitFuncDeclNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+	NodeValue* func_value = new NodeValue(node);
+
+
+	FuncDeclNode* func = reinterpret_cast<FuncDeclNode*> (node->memory);
+	context->symbol_table->Set(func->func_name, func_value);
+	return res->Success(func_value);
+}
+
+
+RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+
+
+	// get call-node
+	FuncCallNode* func = reinterpret_cast<FuncCallNode*> (node->memory);
+	// collect arguments
+	std::vector <NodeValue*> args;
+
+	// search for this function
+	NodeValue* exec_func = context->symbol_table->Get(func->func_name);
+
+	// does not exist
+	if (exec_func == nullptr) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("Function '" + func->func_name +"' is not declared in this scope"),
+			context
+		));
+	}
+	// exists but is not a function
+	else if (exec_func->type != FUNCTION_VALUE) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("'" + func->func_name + "' is not a function"),
+			context
+		));
+	}
+
+	// collect arguments
+	for (ASTNode* a : func->args) {
+		NodeValue* val = res->Register(this->Visit(a, context));
+
+		if (res->error)
+			return res;
+
+		args.push_back(val);
+	}
+
+	NodeValue* return_val = res->Register(exec_func->Execute(this, args));
+	
+
+	if (res->error)
+		return res;
+
+	return res->Success(return_val);
+}
+
+
+RunTimeResult* Interpreter::VisitReturnNode(ASTNode* node, Context* context) {
+	return nullptr;
+}
+
+/*
+def visit_ReturnNode(self, node, context):
+	res = RTResult()
+
+	if node.node_to_return:
+		value = res.register(self.visit(node.node_to_return, context))
+		if res.should_return(): return res
+	else:
+		value = Number.null
+
+	return res.success_return(value)
+*/
+
+

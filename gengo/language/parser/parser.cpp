@@ -299,6 +299,7 @@ ParseResult* Parser::Factor() {
 
 		return res->Success(node);
 	}
+	// function call or identifier
 	else if (this->curr_token.type == TOKEN_IDENTIFIER || this->curr_token.type == TOKEN_INT || this->curr_token.type == TOKEN_FLOAT) {
 		// check for function call
 		if (this->tokens[this->token_index + 1LL].type == TOKEN_LPAREN) {
@@ -837,10 +838,21 @@ ParseResult* Parser::FuncCallExpr() {
 
 	this->Advance();
 
-	std::vector <Token*> args; // { Tokens }
+	// std::vector <Token*> args; // { Tokens }
+	std::vector <ASTNode*> args; // { Tokens }
 
 
 	while (this->curr_token.type != TOKEN_RPAREN) {
+		ASTNode* arg = res->Register(this->Expr());
+
+		if (res->error)
+			return res;
+
+		args.push_back(arg);
+
+		if (this->curr_token.type == TOKEN_COMMA)
+			this->Advance();
+		/*
 		Token* arg = this->curr_token.Copy();
 		args.push_back(arg);
 
@@ -848,6 +860,7 @@ ParseResult* Parser::FuncCallExpr() {
 
 		if (this->curr_token.type == TOKEN_COMMA)
 			this->Advance();
+		*/
 	}
 
 	if (this->curr_token.type != TOKEN_RPAREN) {
@@ -862,6 +875,7 @@ ParseResult* Parser::FuncCallExpr() {
 	this->Advance();
 
 	// string, vector <Token*>
+	// string, vector <ASTNode>
 	return res->Success(new ASTNode(func_name, args));
 }
 

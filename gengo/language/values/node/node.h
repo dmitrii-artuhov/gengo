@@ -5,12 +5,14 @@
 #include "../types.h"
 #include "../../context/context.h"
 
+class Interpreter;
+
 class NodeValue {
 private:
 
 public:
 	value_t type;
-	void* value; // contains one of the classes below
+	void* value; // contains one of the value classes 
 	// (later strings and other entities will be added, so this will be handy, hopefully)
 	Context* context;
 
@@ -31,6 +33,8 @@ public:
 	RunTimeResult* OredBy(NodeValue* other);
 	RunTimeResult* Notted();
 	RunTimeResult* ComparedWith(Token& oper_token, NodeValue* other);
+
+	RunTimeResult* Execute(Interpreter* interpreter, std::vector <NodeValue*> &args);
 
 	bool IsTrue();
 

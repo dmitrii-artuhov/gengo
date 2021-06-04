@@ -9,6 +9,7 @@
 #include "./ast_if/if.h"
 #include "./ast_for/for.h"
 #include "./ast_statements/statements.h"
+#include "./ast_functions/func.h"
 
 enum node_t {
     INT_NODE,
@@ -34,30 +35,6 @@ enum node_t {
     UNDEFIND_NODE,
 };
 
-
-//// Main Node
-//class ASTNode;
-//
-//// Type Nodes
-//class IntNode;
-//class FloatNode;
-//
-//// Variables
-//class VarAssignNode;
-//class VarAccessNode;
-//
-//// Operators Nodes
-//class BinOpNode;
-//class UnOpNode;
-//
-//// Statements 
-//class StatementsNode;
-//
-//// If conditions
-//class IfNode;
-//
-//// For Node
-//class ForNode;
 
 
 /*--- Main Node --------------------------------------------------*/
@@ -91,7 +68,8 @@ public:
 
     // function nodes
     ASTNode(std::string &func_name, std::vector <std::pair <std::string, Token*>> &args, Token* return_type, ASTNode* func_body);
-    ASTNode(std::string &func_name, std::vector <Token*> &args);
+    //ASTNode(std::string &func_name, std::vector <Token*> &args);
+    ASTNode(std::string& func_name, std::vector <ASTNode*>& args);
     ASTNode(ASTNode* expr); // return statement
 
     std::string Represent();

@@ -10,6 +10,7 @@
 
 #include "../int/int.h"
 #include "../float/float.h"
+#include "../function/functions.h"
 
 /*--- Main value node ---------------------------------------*/
 // constructors
@@ -34,6 +35,18 @@ NodeValue::NodeValue(ASTNode* node) {
 
 		this->type = FLOAT_VALUE;
 		this->value = reinterpret_cast<void*> (new FloatNumber(val));
+	}
+	else if (node->type == FUNC_DECL_NODE) {
+		FuncDeclNode* func = reinterpret_cast<FuncDeclNode*> (node->memory);
+
+		this->type = FUNCTION_VALUE;
+		this->value = reinterpret_cast<void*> (new Function(
+			func->func_name,
+			func->args,
+			func->return_type,
+			func->func_body,
+			this->context
+		));
 	}
 	else {
 		this->type = UNDEFIND_VALUE;
@@ -239,6 +252,30 @@ RunTimeResult* NodeValue::ComparedWith(Token& oper_token, NodeValue* other) {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
 			std::string("Undefined value type"),
+			this->context
+		));
+	}
+}
+
+
+RunTimeResult* NodeValue::Execute(Interpreter* interpreter, std::vector <NodeValue*> &args) {
+	RunTimeResult* res = new RunTimeResult();
+
+	if (this->type == FUNCTION_VALUE) {
+		// make copy of the function instance to support recursion
+		Function* func = reinterpret_cast<Function*> (this->value);
+
+		NodeValue* return_val = res->Register(func->Copy()->Execute(interpreter, args));
+
+		if (res->error)
+			return res;
+
+		return res->Success(return_val);
+	}
+	else {
+		return res->Failure(new Error(
+			ERROR_INTERNAL,
+			std::string("'Execute' method is not supported for provided type"),
 			this->context
 		));
 	}

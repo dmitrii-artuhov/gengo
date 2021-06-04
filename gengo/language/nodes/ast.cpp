@@ -123,7 +123,7 @@ ASTNode::ASTNode(std::string &func_name, std::vector <std::pair <std::string, To
     this->memory = reinterpret_cast<void*>(new FuncDeclNode(func_name, args, return_type, func_body));
 }
 
-ASTNode::ASTNode(std::string& func_name, std::vector <Token*>& args) {
+ASTNode::ASTNode(std::string& func_name, std::vector <ASTNode*>& args) {
     this->type = FUNC_CALL_NODE;
     this->memory = reinterpret_cast<void*>(new FuncCallNode(func_name, args));
 }

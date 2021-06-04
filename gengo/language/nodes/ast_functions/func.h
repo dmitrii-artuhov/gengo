@@ -1,6 +1,7 @@
 #pragma once
 
 class ASTNode;
+class NodeValue;
 
 
 /*--- Function declaration ---------------------------------------*/
@@ -24,9 +25,9 @@ class FuncCallNode {
 private:
 public:
     std::string func_name;
-    std::vector <Token*> args;
+    std::vector <ASTNode*> args;
 
-    FuncCallNode(std::string& func_name, std::vector <Token*> args);
+    FuncCallNode(std::string& func_name, std::vector <ASTNode*> args);
 
     std::string Represent();
 };
