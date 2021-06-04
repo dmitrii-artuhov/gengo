@@ -6,23 +6,78 @@
 Language Entity | Ruleset
 ------------ | -------------
 statements	 | expr NEWLINE (expr NEWLINE)*
+
+statement	 | expr
+&nbsp;		 | KEYWORD:return expr
+
 expr		 | (KEYWORD:TYPE)? IDENTIFIER EQ expr
 &nbsp; 		 | comp-expr
+
 comp-expr	 | arith-expr ((AND\|OR\|EQEQ\|NE\|GT\|GTE\|LT\|LTE) arith-expr)*
+
 arith-expr	 | term ((PLUS\|MINUS) term)*
+
 term		 | factor ((MUL\|DIV) factor)*
+
 factor		 | INT\|FLOAT\|IDENTIFIER
-&nbsp;		 | (PLUS\|MINUS) factor
+&nbsp;		 | INT\|FLOAT\|IDENTIFIER
+&nbsp;		 | IDENTIFIER LPAREN (expr (COMMA expr)*)? RPAREN
+&nbsp;	     | (PLUS\|MINUS) factor
 &nbsp;		 | LPAREN comp-expr RPAREN
 &nbsp;		 | NOT comp-expr
 &nbsp;		 | if-expr
 &nbsp;		 | for-expr
+&nbsp;		 | func-def
+
+func-def	 | KEYWORD:function IDENTIFIER LPAREN (IDENTIFIER COLON KEYWORD:TYPE
+&nbsp;		 | (COMMA IDENTIFIER COLON KEYWORD:TYPE)*)? RPAREN ARROW KEYWORD:TYPE
+&nbsp;		 | LBRACE statements RBRACE
+
 if-expr		 | KEYWORD:if LPAREN expr RPAREN LBRACE statements RBRACE
 &nbsp;		 | (if-else-expr\|else-expr)?
+
 if-else-expr | KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
 &nbsp;		 | (if-else-expr\|else-expr)?
+
 else-expr	 | KEYWORD:otherwise LBRACE statements RBRACE
+
 for-expr	 | KEYWORD:loop LPAREN (expr)? NEWLINE expr NEWLINE (expr)? RPAREN LBRACE statements RBRACE
+
+
+## Features (pre-release 0.5.0)
+- Functions
+- Recursion support
+
+## Snippets (functions)
+Function declaration:
+```sh
+function add(a: int, b: int) -> int {
+	return a + b;
+};
+```
+
+```sh
+function sum(a: int) -> int {
+	if (a == 0) {
+		return 0;
+	}
+	otherwise {
+		return a + sum(a - 1);
+	};
+};
+```
+
+Function call:
+```sh
+gengo > add(10, 15 - 1);
+24
+```
+
+```sh
+gengo > sum(3);
+6
+```
+
 
 ## Features (pre-release 0.4.0)
 - For loops (with correct scope management)
