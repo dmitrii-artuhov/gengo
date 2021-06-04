@@ -29,7 +29,7 @@ std::string Error::As_string() {
 		res += this->error_name + ":" + this->details;
 		res += "\n";
 
-		res += "File "
+		res += "At "
 			+ this->pos_start.file_name + ", line "
 			+ std::to_string((this->pos_start.line + 1))
 			+ ":"
@@ -47,7 +47,7 @@ std::string Error::Traceback() {
 	Context* curr_ctx = this->context;
 
 	while (curr_ctx) {
-		res = std::string("File " + curr_ctx->name + "\n") + res;
+		res = std::string("At " + curr_ctx->name + "\n") + res;
 		curr_ctx = curr_ctx->parent;
 	}
 

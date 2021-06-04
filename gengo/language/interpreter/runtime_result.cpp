@@ -9,10 +9,10 @@
 class NodeValue;
 
 RunTimeResult::RunTimeResult() :
-	result(nullptr), error(nullptr) {}
+	result(nullptr), error(nullptr), return_val(false) {}
 
 RunTimeResult::RunTimeResult(NodeValue* node, Error* err) :
-	result(node), error(err) {}
+	result(node), error(err), return_val(false) {}
 
 RunTimeResult* RunTimeResult::Failure(Error* err) {
 	this->error = err;
@@ -29,6 +29,13 @@ NodeValue* RunTimeResult::Register(RunTimeResult* res) {
 		this->error = res->error;
 	}
 	return res->result;
+}
+
+bool RunTimeResult::ShouldReturn() {
+	if (this->error || this->return_val)
+		return true;
+	
+	return false;
 }
 
 

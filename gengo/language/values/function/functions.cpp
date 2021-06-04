@@ -60,13 +60,13 @@ RunTimeResult* BaseFunction::PopulateArguments(std::vector <NodeValue*>& passed_
     int i = 0;
     for (std::pair <std::string, Token*> p : this->func_args) {
         std::string arg_name = p.first,
-                    arg_type = p.second->type;
+                    arg_type = p.second->value;
         NodeValue* arg_val = passed_args[i];
         value_t arg_type_t = (value_t)0;
     
         // choose proper type
-        if (arg_type == TOKEN_INT) arg_type_t = INT_VALUE;
-        else if (arg_type == TOKEN_FLOAT) arg_type_t = FLOAT_VALUE;
+        if (arg_type == TYPE_INT) arg_type_t = INT_VALUE;
+        else if (arg_type == TYPE_FLOAT) arg_type_t = FLOAT_VALUE;
 
         arg_val = NodeValue::CastToType(arg_val, arg_type_t);
 
@@ -113,24 +113,24 @@ RunTimeResult* Function::Execute(Interpreter* interpreter, std::vector <NodeValu
 
     res->Register(this->CheckArguments(args));
 
-    if (res->error)
+    if (res->ShouldReturn())
         return res;
 
     res->Register(this->PopulateArguments(args));
 
-    if (res->error)
+    if (res->ShouldReturn())
         return res;
 
     NodeValue* return_val = res->Register(interpreter->Visit(this->func_body, this->context));
 
-    if (res->error)
+    if (res->ShouldReturn())
         return res;
 
     // Cast to correct return type
-    if (this->return_type->type == TOKEN_INT) {
+    if (this->return_type->value == TYPE_INT) {
         return_val = NodeValue::CastToType(return_val, INT_VALUE);
     }
-    else if (this->return_type->type == TOKEN_FLOAT) {
+    else if (this->return_type->value == TYPE_FLOAT) {
         return_val = NodeValue::CastToType(return_val, FLOAT_VALUE);
     }
 

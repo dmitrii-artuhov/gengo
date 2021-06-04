@@ -23,6 +23,7 @@ public:
 
 	std::string Represent();
 	NodeValue* SetContext(Context* ctx);
+	NodeValue* PropContext(Context* ctx);
 
 	RunTimeResult* Add(NodeValue* other);
 	RunTimeResult* Sub(NodeValue* other);

@@ -78,7 +78,7 @@ RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) 
 
 	NodeValue* val = res->Register(this->Visit(var_node->expr, context));
 
-	if (res->error) {
+	if (res->ShouldReturn()) {
 		return res;
 	}
 
@@ -112,7 +112,7 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 
 	NodeValue* val = res->Register(this->Visit(var_node->expr, context));
 
-	if (res->error) {
+	if (res->ShouldReturn()) {
 		return res;
 	}
 
@@ -127,7 +127,7 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 	}
 
 
-	if (res->error) {
+	if (res->ShouldReturn()) {
 		return res;
 	}
 
@@ -162,13 +162,13 @@ RunTimeResult* Interpreter::VisitBinOpNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 
 	NodeValue*  l_node = res->Register(this->Visit(curr_node->left, context));
-	if (res->error) {
+	if (res->ShouldReturn()) {
 		return res;
 	}
 
 	NodeValue* r_node = res->Register(this->Visit(curr_node->right, context));
 
-	if (res->error) {
+	if (res->ShouldReturn()) {
 		return res;
 	}
 
@@ -238,7 +238,7 @@ RunTimeResult* Interpreter::VisitStatementsNode(ASTNode* node, Context* context)
 	for (int i = 0; i < nodes.size(); i++) {
 		res = this->Visit(nodes[i], context);
 
-		if (res->error) {
+		if (res->ShouldReturn()) {
 			return res;
 		}
 	}
@@ -258,12 +258,12 @@ RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
 
 	for (std::pair <ASTNode*, ASTNode*> p : ast->cases) {
 		NodeValue* condition_value = res->Register(this->Visit(p.first, curr_context));
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 
 		if (condition_value->IsTrue()) {
 			NodeValue* expr_val = res->Register(this->Visit(p.second, curr_context));
-			if (res->error)
+			if (res->ShouldReturn())
 				return res;
 			return res->Success(expr_val);
 		}
@@ -271,7 +271,7 @@ RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
 
 	if (ast->else_case) {
 		NodeValue* expr_val = res->Register(this->Visit(ast->else_case, curr_context));
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 		return res->Success(expr_val);
 	}
@@ -294,32 +294,32 @@ RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
 	NodeValue* init = nullptr;
 	if (ast->init != nullptr) {
 		init = res->Register(this->Visit(ast->init, curr_context));
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 	}
 
 	// condition 
 
 	NodeValue* cond = res->Register(this->Visit(ast->cond, curr_context));
-	if (res->error)
+	if (res->ShouldReturn())
 		return res;
 
 	while (cond->IsTrue()) {
 		// increment
 		if (ast->inc != nullptr) {
 			res->Register(this->Visit(ast->inc, curr_context));
-			if (res->error)
+			if (res->ShouldReturn())
 				return res;
 		}
 
 		res->Register(this->Visit(ast->body, curr_context));
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 
 		// condition - is not optimized well
 		// (figure out a better way of doing this)
 		cond = res->Register(this->Visit(ast->cond, curr_context));
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 	}
 
@@ -331,9 +331,14 @@ RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
 RunTimeResult* Interpreter::VisitFuncDeclNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 	NodeValue* func_value = new NodeValue(node);
-
-
+	
+	// init function context
 	FuncDeclNode* func = reinterpret_cast<FuncDeclNode*> (node->memory);
+	func_value->context = new Context(func->func_name, context);
+	func_value->context->symbol_table = new SymbolTable(context->symbol_table);
+	func_value->PropContext(func_value->context);
+
+
 	context->symbol_table->Set(func->func_name, func_value);
 	return res->Success(func_value);
 }
@@ -341,7 +346,6 @@ RunTimeResult* Interpreter::VisitFuncDeclNode(ASTNode* node, Context* context) {
 
 RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
-
 
 	// get call-node
 	FuncCallNode* func = reinterpret_cast<FuncCallNode*> (node->memory);
@@ -372,7 +376,7 @@ RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 	for (ASTNode* a : func->args) {
 		NodeValue* val = res->Register(this->Visit(a, context));
 
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 
 		args.push_back(val);
@@ -381,7 +385,7 @@ RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 	NodeValue* return_val = res->Register(exec_func->Execute(this, args));
 	
 
-	if (res->error)
+	if (res->ShouldReturn())
 		return res;
 
 	return res->Success(return_val);
@@ -389,20 +393,18 @@ RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 
 
 RunTimeResult* Interpreter::VisitReturnNode(ASTNode* node, Context* context) {
-	return nullptr;
+	RunTimeResult* res = new RunTimeResult();
+
+	ReturnNode* return_node = reinterpret_cast<ReturnNode*> (node->memory);
+
+	NodeValue* return_val = res->Register(this->Visit(return_node->expr, context));
+
+	if (res->ShouldReturn())
+		return res;
+
+	res->return_val = true;
+
+	return res->Success(return_val);
 }
-
-/*
-def visit_ReturnNode(self, node, context):
-	res = RTResult()
-
-	if node.node_to_return:
-		value = res.register(self.visit(node.node_to_return, context))
-		if res.should_return(): return res
-	else:
-		value = Number.null
-
-	return res.success_return(value)
-*/
 
 

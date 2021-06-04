@@ -10,6 +10,7 @@ private:
 public:
 	NodeValue* result;
 	Error* error;
+	bool return_val;
 
 	RunTimeResult();
 	RunTimeResult(NodeValue* node, Error* err);
@@ -17,4 +18,5 @@ public:
 	RunTimeResult* Failure(Error* err);
 	RunTimeResult* Success(NodeValue* node);
 	NodeValue* Register(RunTimeResult* res);
+	bool ShouldReturn();
 };

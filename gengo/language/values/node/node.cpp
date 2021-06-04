@@ -79,10 +79,22 @@ std::string NodeValue::Represent() {
 
 	return res;
 }
+
+
 NodeValue* NodeValue::SetContext(Context* context) {
 	this->context = context;
 	return this;
 }
+
+NodeValue* NodeValue::PropContext(Context* context) {
+	if (this->type == FUNCTION_VALUE) {
+		Function* node = reinterpret_cast<Function*>(this->value);
+		node->context = context;
+	}
+	
+	return this;
+}
+
 bool NodeValue::IsTrue() {
 	if (this->type == INT_VALUE) {
 		IntNumber* curr = reinterpret_cast<IntNumber*>(this->value);
@@ -267,7 +279,7 @@ RunTimeResult* NodeValue::Execute(Interpreter* interpreter, std::vector <NodeVal
 
 		NodeValue* return_val = res->Register(func->Copy()->Execute(interpreter, args));
 
-		if (res->error)
+		if (res->ShouldReturn())
 			return res;
 
 		return res->Success(return_val);

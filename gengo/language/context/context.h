@@ -14,6 +14,7 @@ public:
 
 	SymbolTable* parent;
 	SymbolTable();
+	SymbolTable(SymbolTable* parent);
 
 	NodeValue* Get(std::string key);
 	void Set(std::string key, NodeValue* val);
@@ -32,6 +33,6 @@ public:
 	SymbolTable* symbol_table;
 
 	Context();
-	Context(std::string &name, Context* parent);
+	Context(std::string& name, Context* parent);
 };
 
