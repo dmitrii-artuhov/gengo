@@ -14,7 +14,6 @@ comp-expr	 | arith-expr ((AND\|OR\|EQEQ\|NE\|GT\|GTE\|LT\|LTE) arith-expr)*
 arith-expr	 | term ((PLUS\|MINUS) term)*
 term		 | factor ((MUL\|DIV) factor)*
 factor		 | INT\|FLOAT\|IDENTIFIER
-&nbsp;		 | INT\|FLOAT\|IDENTIFIER
 &nbsp;		 | IDENTIFIER LPAREN (expr (COMMA expr)*)? RPAREN
 &nbsp;	     | (PLUS\|MINUS) factor
 &nbsp;		 | LPAREN comp-expr RPAREN
