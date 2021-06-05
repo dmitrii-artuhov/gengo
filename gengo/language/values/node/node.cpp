@@ -53,6 +53,29 @@ NodeValue::NodeValue(ASTNode* node) {
 		this->value = nullptr;
 	}
 };
+
+NodeValue::NodeValue(Context* ctx, const std::string& func_name) {
+	this->context = ctx;
+	this->type = BUILT_IN_FUNCTION_VALUE;
+
+	std::string name = func_name;
+
+	if (name == BUILT_IN_FUNCTION_PRINT) {
+		Token *arg_token = new Token(), 
+			  *return_token = new Token();
+		arg_token->type = return_token->type = TOKEN_TYPE;
+		arg_token->value = return_token ->value = TYPE_INT;
+
+		this->value = reinterpret_cast<void*> (new BuiltInFunction(
+			name,
+			std::vector <std::pair <std::string, Token*>>{ { std::string("value"), arg_token }},
+			return_token,
+			this->context
+		));
+	}
+}
+
+
 NodeValue::NodeValue(long long val) {
 	this->context = nullptr;
 	this->type = INT_VALUE;
@@ -278,6 +301,17 @@ RunTimeResult* NodeValue::Execute(Interpreter* interpreter, std::vector <NodeVal
 		Function* func = reinterpret_cast<Function*> (this->value);
 
 		NodeValue* return_val = res->Register(func->Copy()->Execute(interpreter, args));
+
+		if (res->ShouldReturn())
+			return res;
+
+		return res->Success(return_val);
+	}
+	else if (this->type == BUILT_IN_FUNCTION_VALUE) {
+		// make copy of the function instance to support recursion
+		BuiltInFunction* func = reinterpret_cast<BuiltInFunction*> (this->value);
+
+		NodeValue* return_val = res->Register(func->Copy()->Execute(args));
 
 		if (res->ShouldReturn())
 			return res;

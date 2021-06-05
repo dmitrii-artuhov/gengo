@@ -41,14 +41,25 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 				Context* ctx = new Context(file_name, nullptr);
 				ctx->symbol_table = global_table;
 
-				Interpreter* interpreter = new Interpreter();
+				/*
+				##########################
+				#   BUILT_IN FUNCTIONS   #
+				##########################
+				*/
+				// Print
+				ctx->symbol_table->Set(
+					BUILT_IN_FUNCTION_PRINT,
+					new NodeValue(ctx, BUILT_IN_FUNCTION_PRINT)
+				);
 
+
+				Interpreter* interpreter = new Interpreter();
 				RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast, ctx);
 
 				if (interpret_res->error) {
 					std::cout << interpret_res->error->As_string() << std::endl;
 				}
-				else if (interpret_res->result) {
+				else if (GENGO_LOG_TO_CONSOLE && interpret_res->result) {
 					std::cout << interpret_res->result->Represent() << std::endl;
 				}
 			}

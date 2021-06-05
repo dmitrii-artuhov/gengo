@@ -364,7 +364,7 @@ RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 		));
 	}
 	// exists but is not a function
-	else if (exec_func->type != FUNCTION_VALUE) {
+	else if (exec_func->type != FUNCTION_VALUE && exec_func->type != BUILT_IN_FUNCTION_VALUE) {
 		return res->Failure(new Error(
 			ERROR_RUNTIME,
 			std::string("'" + func->func_name + "' is not a function"),

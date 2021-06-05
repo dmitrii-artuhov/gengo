@@ -66,6 +66,9 @@ const std::string
 	KEYWORD_FUNCTION = "function",
 	KEYWORD_RETURN = "return";
 
+/*--- BuiltIn Functions -----------------------------------------------------------*/
+const std::string
+	BUILT_IN_FUNCTION_PRINT = "print";
 
 const std::vector <std::string> TYPES = {
 	TYPE_INT,

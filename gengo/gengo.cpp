@@ -3,7 +3,7 @@
 #include "./language/context/context.h"
 
 int main() {
-	std::string FILE_NAME = "<console input>";
+	std::string FILE_NAME = "<console>";
 	SymbolTable* global_table = new SymbolTable();
 	global_table->parent = nullptr;
 
