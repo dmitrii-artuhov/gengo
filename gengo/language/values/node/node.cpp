@@ -10,6 +10,7 @@
 
 #include "../int/int.h"
 #include "../float/float.h"
+#include "../string/string.h"
 #include "../function/functions.h"
 
 /*--- Main value node ---------------------------------------*/
@@ -35,6 +36,13 @@ NodeValue::NodeValue(ASTNode* node) {
 
 		this->type = FLOAT_VALUE;
 		this->value = reinterpret_cast<void*> (new FloatNumber(val));
+	}
+	else if (node->type == STRING_VALUE) {
+		StringNode* curr_node = reinterpret_cast<StringNode*>(node->memory);
+		std::string val = curr_node->token.value;
+
+		this->type = STRING_VALUE;
+		this->value = reinterpret_cast<void*> (new String(val));
 	}
 	else if (node->type == FUNC_DECL_NODE) {
 		FuncDeclNode* func = reinterpret_cast<FuncDeclNode*> (node->memory);
@@ -64,7 +72,7 @@ NodeValue::NodeValue(Context* ctx, const std::string& func_name) {
 		Token *arg_token = new Token(), 
 			  *return_token = new Token();
 		arg_token->type = return_token->type = TOKEN_TYPE;
-		arg_token->value = return_token ->value = TYPE_INT;
+		arg_token->value = return_token ->value = TYPE_STRING;
 
 		this->value = reinterpret_cast<void*> (new BuiltInFunction(
 			name,
@@ -86,6 +94,11 @@ NodeValue::NodeValue(long double val) {
 	this->type = FLOAT_VALUE;
 	this->value = reinterpret_cast<void*> (new FloatNumber(val));
 }
+NodeValue::NodeValue(std::string& val) {
+	this->context = nullptr;
+	this->type = STRING_VALUE;
+	this->value = reinterpret_cast<void*> (new String(val));
+}
 
 // internal methods
 std::string NodeValue::Represent() {
@@ -98,6 +111,10 @@ std::string NodeValue::Represent() {
 	else if (this->type == FLOAT_VALUE) {
 		FloatNumber* node = reinterpret_cast<FloatNumber*>(this->value);
 		res = std::to_string(node->value);
+	}
+	else if (this->type == STRING_VALUE) {
+		String* node = reinterpret_cast<String*>(this->value);
+		res = node->value;
 	}
 
 	return res;
@@ -145,10 +162,14 @@ RunTimeResult* NodeValue::Add(NodeValue* other) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
 		return res->Success(curr->Add(other));
 	}
+	else if (this->type == STRING_VALUE) {
+		String* curr = reinterpret_cast<String*>(this->value);
+		return res->Success(curr->Add(other));
+	}
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support '+' operator"),
 			this->context
 		));
 	}
@@ -167,7 +188,7 @@ RunTimeResult* NodeValue::Sub(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support '-' operator"),
 			this->context
 		));
 	}
@@ -186,7 +207,7 @@ RunTimeResult* NodeValue::Mult(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support '*' operator"),
 			this->context
 		));
 	}
@@ -205,7 +226,7 @@ RunTimeResult* NodeValue::Div(NodeValue* other) {
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support '/' operator"),
 			this->context
 		));
 	}
@@ -223,10 +244,14 @@ RunTimeResult* NodeValue::AndedBy(NodeValue* other) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
 		return res->Success(curr->AndedBy(other));
 	}
+	else if (this->type == STRING_VALUE) {
+		String* curr = reinterpret_cast<String*>(this->value);
+		return res->Success(curr->AndedBy(other));
+	}
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support 'and' operator"),
 			this->context
 		));
 	}
@@ -243,10 +268,14 @@ RunTimeResult* NodeValue::OredBy(NodeValue* other) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
 		return res->Success(curr->OredBy(other));
 	}
+	else if (this->type == STRING_VALUE) {
+		String* curr = reinterpret_cast<String*>(this->value);
+		return res->Success(curr->OredBy(other));
+	}
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support 'or' operator"),
 			this->context
 		));
 	}
@@ -263,10 +292,14 @@ RunTimeResult* NodeValue::Notted() {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
 		return res->Success(curr->Notted());
 	}
+	else if (this->type == STRING_VALUE) {
+		String* curr = reinterpret_cast<String*>(this->value);
+		return res->Success(curr->Notted());
+	}
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support 'not' operator"),
 			this->context
 		));
 	}
@@ -283,10 +316,14 @@ RunTimeResult* NodeValue::ComparedWith(Token& oper_token, NodeValue* other) {
 		FloatNumber* curr = reinterpret_cast<FloatNumber*>(this->value);
 		return res->Success(curr->ComparedWith(oper_token, other));
 	}
+	else if (this->type == STRING_VALUE) {
+		String* curr = reinterpret_cast<String*>(this->value);
+		return res->Success(curr->ComparedWith(oper_token, other));
+	}
 	else {
 		return res->Failure(new Error(
 			ERROR_INTERNAL,
-			std::string("Undefined value type"),
+			std::string("Provided type does not support compare operators"),
 			this->context
 		));
 	}
@@ -346,5 +383,20 @@ NodeValue* NodeValue::CastToType(NodeValue* val, value_t cast_type) {
 			return new NodeValue(number);
 		}
 		else if (val->type == FLOAT_VALUE) return val;
+	}
+	else if (cast_type == STRING_VALUE) {
+		if (val->type == INT_VALUE) {
+			IntNumber* node = reinterpret_cast<IntNumber*>(val->value);
+			std::string str = std::to_string(node->value);
+
+			return new NodeValue(str);
+		}
+		else if (val->type == FLOAT_VALUE) {
+			FloatNumber* node = reinterpret_cast<FloatNumber*>(val->value);
+			std::string str = std::to_string(node->value);
+
+			return new NodeValue(str);
+		}
+		else if (val->type == STRING_NODE) return val;
 	}
 }

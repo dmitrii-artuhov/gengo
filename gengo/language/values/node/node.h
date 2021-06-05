@@ -23,6 +23,7 @@ public:
 	NodeValue(Context* ctx, const std::string& func_name);
 	NodeValue(long long val);
 	NodeValue(long double val);
+	NodeValue(std::string& val);
 
 	std::string Represent();
 	NodeValue* SetContext(Context* ctx);

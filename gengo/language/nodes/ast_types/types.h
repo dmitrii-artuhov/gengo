@@ -19,3 +19,12 @@ public:
     FloatNode(Token& token);
     std::string Represent();
 };
+
+// String Node
+class StringNode {
+private:
+public:
+    Token token;
+    StringNode(Token& token);
+    std::string Represent();
+};

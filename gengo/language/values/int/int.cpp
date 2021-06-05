@@ -3,6 +3,7 @@
 #include "../types.h"
 #include "../node/node.h"
 #include "../float/float.h"
+#include "../string/string.h"
 #include "../../tokens/token.h"
 
 
@@ -26,6 +27,12 @@ NodeValue* IntNumber::Add(NodeValue* other) {
 		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
 
 		long double res = (long double)this->value + neigh->value;
+		return new NodeValue(res);
+	}
+	else if (other->type == STRING_VALUE) {
+		String* neigh = reinterpret_cast<String*>(other->value);
+
+		std::string res = std::to_string(this->value) + neigh->value;
 		return new NodeValue(res);
 	}
 }
@@ -101,6 +108,12 @@ NodeValue* IntNumber::AndedBy(NodeValue* other) {
 		long long res = this->value && neigh->value;
 		return new NodeValue(res);
 	}
+	else if (other->type == STRING_VALUE) {
+		String* neigh = reinterpret_cast<String*>(other->value);
+
+		long long res = this->value && neigh->value.size();
+		return new NodeValue(res);
+	}
 }
 
 // or
@@ -115,6 +128,12 @@ NodeValue* IntNumber::OredBy(NodeValue* other) {
 		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
 
 		long long res = this->value || neigh->value;
+		return new NodeValue(res);
+	}
+	else if (other->type == STRING_VALUE) {
+		String* neigh = reinterpret_cast<String*>(other->value);
+
+		long long res = this->value || neigh->value.size();
 		return new NodeValue(res);
 	}
 }
@@ -139,6 +158,12 @@ NodeValue* IntNumber::ComparedWith(Token& oper_token, NodeValue* other) {
 		FloatNumber* neigh = reinterpret_cast<FloatNumber*>(other->value);
 
 		long long res = (long long)NodeValue::Compare(oper_token, this->value, neigh->value);
+		return new NodeValue(res);
+	}
+	else if (other->type == STRING_VALUE) {
+		String* neigh = reinterpret_cast<String*>(other->value);
+
+		long long res = (long long)NodeValue::Compare(oper_token, std::to_string(this->value), neigh->value);
 		return new NodeValue(res);
 	}
 }

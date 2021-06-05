@@ -27,6 +27,7 @@ public:
 	// Helpers
 	Token MakeIdentifier(); // typedefine | variable | and | or | not
 	Token MakeNumberToken();
+	Token MakeStringToken();
 	Token MakeEquals(); // '=' | '=='
 	Token MakeGreaterEquals(); // '>' | '>='
 	Token MakeLessEquals(); // '<' | '<='

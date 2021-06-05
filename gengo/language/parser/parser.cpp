@@ -300,7 +300,10 @@ ParseResult* Parser::Factor() {
 		return res->Success(node);
 	}
 	// function call or identifier
-	else if (this->curr_token.type == TOKEN_IDENTIFIER || this->curr_token.type == TOKEN_INT || this->curr_token.type == TOKEN_FLOAT) {
+	else if (this->curr_token.type == TOKEN_IDENTIFIER ||
+		this->curr_token.type == TOKEN_INT ||
+		this->curr_token.type == TOKEN_FLOAT ||
+		this->curr_token.type == TOKEN_STRING) {
 		// check for function call
 		if (this->tokens[this->token_index + 1LL].type == TOKEN_LPAREN) {
 			// func call

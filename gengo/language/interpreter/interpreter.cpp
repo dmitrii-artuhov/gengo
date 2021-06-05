@@ -14,6 +14,9 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == FLOAT_NODE) {
 		this->RunTimeRes = this->VisitFloatNode(node, context);
 	}
+	else if (node->type == STRING_NODE) {
+		this->RunTimeRes = this->VisitStringNode(node, context);
+	}
 	else if (node->type == VAR_ASSIGN_NODE) {
 		this->RunTimeRes = this->VisitVarAssignNode(node, context);
 	}
@@ -69,6 +72,11 @@ RunTimeResult* Interpreter::VisitFloatNode(ASTNode* node, Context* context) {
 	return (new RunTimeResult())->Success(res->SetContext(context));
 	// return (new RunTimeResult())->Success(new NodeValue(node));
 }
+RunTimeResult* Interpreter::VisitStringNode(ASTNode* node, Context* context) {
+	NodeValue* res = new NodeValue(node);
+	return (new RunTimeResult())->Success(res->SetContext(context));
+}
+
 
 // Visit variables
 RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) {
@@ -90,6 +98,9 @@ RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) 
 	}
 	else if (var_node->token.value == TYPE_FLOAT) {
 		casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
+	}
+	else if (var_node->token.value == TYPE_STRING) {
+		casted_val = NodeValue::CastToType(val, STRING_VALUE);
 	}
 
 	context->symbol_table->Set(var_node->var_name, casted_val);
@@ -117,15 +128,18 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 	}
 
 	// casting variables to specified types
-	NodeValue* casted_val;
+	NodeValue* casted_val = NodeValue::CastToType(val, var_stored->type);
 
-	if (var_stored->type == INT_VALUE) {
-		casted_val = NodeValue::CastToType(val, INT_VALUE);
-	}
-	else if (var_stored->type == FLOAT_VALUE) {
-		casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
-	}
-
+	//if (var_stored->type == INT_VALUE) {
+	//	casted_val = NodeValue::CastToType(val, INT_VALUE);
+	//}
+	//else if (var_stored->type == FLOAT_VALUE) {
+	//	casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
+	//}
+	//else if (var_stored->type == STRING_VALUE) {
+	//	casted_val = NodeValue::CastToType(val, STRING_VALUE);
+	//}
+	//
 
 	if (res->ShouldReturn()) {
 		return res;
