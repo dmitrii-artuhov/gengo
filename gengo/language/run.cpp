@@ -14,7 +14,7 @@
 
 
 
-void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
+void run(std::string& file_name, std::string& text, Context* ctx) {
 	// Lexer
 	Lexer lexer(file_name, text);
 	LexerResult* lex_res = lexer.MakeTokens();
@@ -38,21 +38,6 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 
 			// Interpreter
 			if (GENGO_INTERPRET) {
-				Context* ctx = new Context(file_name, nullptr);
-				ctx->symbol_table = global_table;
-
-				/*
-				##########################
-				#   BUILT_IN FUNCTIONS   #
-				##########################
-				*/
-				// Print
-				ctx->symbol_table->Set(
-					BUILT_IN_FUNCTION_PRINT,
-					new NodeValue(ctx, BUILT_IN_FUNCTION_PRINT)
-				);
-
-
 				Interpreter* interpreter = new Interpreter();
 				RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast, ctx);
 

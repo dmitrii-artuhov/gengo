@@ -63,16 +63,29 @@ NodeValue::NodeValue(ASTNode* node) {
 };
 
 NodeValue::NodeValue(Context* ctx, const std::string& func_name) {
-	this->context = ctx;
-	this->type = BUILT_IN_FUNCTION_VALUE;
-
 	std::string name = func_name;
+
+	this->context = new Context(name, ctx);
+	this->type = BUILT_IN_FUNCTION_VALUE;
 
 	if (name == BUILT_IN_FUNCTION_PRINT) {
 		Token *arg_token = new Token(), 
 			  *return_token = new Token();
 		arg_token->type = return_token->type = TOKEN_TYPE;
 		arg_token->value = return_token ->value = TYPE_STRING;
+
+		this->value = reinterpret_cast<void*> (new BuiltInFunction(
+			name,
+			std::vector <std::pair <std::string, Token*>>{ { std::string("value"), arg_token }},
+			return_token,
+			this->context
+		));
+	}
+	else if (name == BUILT_IN_FUNCTION_SIZE) {
+		Token* arg_token = new Token(),
+			* return_token = new Token();
+		arg_token->type = return_token->type = TOKEN_TYPE;
+		arg_token->value = TYPE_STRING, return_token->value = TYPE_INT;
 
 		this->value = reinterpret_cast<void*> (new BuiltInFunction(
 			name,

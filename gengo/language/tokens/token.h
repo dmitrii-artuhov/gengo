@@ -70,7 +70,8 @@ const std::string
 
 /*--- BuiltIn Functions -----------------------------------------------------------*/
 const std::string
-	BUILT_IN_FUNCTION_PRINT = "print";
+	BUILT_IN_FUNCTION_PRINT = "print",
+	BUILT_IN_FUNCTION_SIZE = "size";
 
 /*--- Types -----------------------------------------------------------*/
 

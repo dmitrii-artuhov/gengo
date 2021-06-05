@@ -9,4 +9,4 @@
 	std::vector<Token>,
 	IllegalCharError*
 >*/
-void run(std::string& file_name, std::string& text, SymbolTable* global_table);
+void run(std::string& file_name, std::string& text, Context* ctx);

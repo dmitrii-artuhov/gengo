@@ -4,7 +4,7 @@
 #include "../node/node.h"
 #include "../float/float.h"
 #include "../../tokens/token.h"
-
+#include "../string/string.h"
 
 
 /*--- Base Function ------------------------------------------*/
@@ -94,8 +94,12 @@ Function* Function::Copy() {
         this->func_args,
         this->return_type,
         this->func_body,
-        new Context(this->context->name, this->context)
+        new Context()
     );
+
+    new_func->context->name = this->context->name;
+    new_func->context->symbol_table = this->context->symbol_table;
+    new_func->context->parent = this->context->parent;
 
     return new_func;
 }
@@ -146,8 +150,13 @@ BuiltInFunction* BuiltInFunction::Copy() {
         this->func_name,
         this->func_args,
         this->return_type,
-        new Context(this->context->name, this->context)
+        new Context()
     );
+
+    new_func->context->name = this->context->name;
+    new_func->context->symbol_table = this->context->symbol_table;
+    new_func->context->parent = this->context->parent;
+
 
     return new_func;
 }
@@ -170,6 +179,20 @@ RunTimeResult* BuiltInFunction::Execute(std::vector <NodeValue*>& args) {
         NodeValue* return_val = res->Register(
             this->Print()
         );
+
+
+        if (res->ShouldReturn())
+            return res;
+
+        return res->Success(return_val);
+    }
+    else if (this->func_name == BUILT_IN_FUNCTION_SIZE) {
+        NodeValue* return_val = res->Register(
+            this->Size()
+        );
+
+        if (res->ShouldReturn())
+            return res;
 
         return res->Success(return_val);
     }
@@ -199,7 +222,35 @@ RunTimeResult* BuiltInFunction::Print() {
 
     std::cout << val->Represent() << std::endl;
 
-    return res->Success(NULL);
+    return res->Success(val);
+}
+
+
+RunTimeResult* BuiltInFunction::Size() {
+    RunTimeResult* res = new RunTimeResult();
+
+    NodeValue* val = this->context->symbol_table->Get("value");
+
+    if (!val) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No argument found for '" + BUILT_IN_FUNCTION_SIZE + "' function"),
+            this->context
+        ));
+    }
+
+    if (val->type != STRING_VALUE) {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Invalid argument type provided. Expected 'string'."),
+            this->context
+        ));
+    }
+
+    String* str_val = reinterpret_cast<String*> (val->value);
+    NodeValue* res_val = new NodeValue((long long)str_val->value.size());
+
+    return res->Success(res_val);
 }
 
 

@@ -62,4 +62,5 @@ public:
 
 	/*--- Built-in functions ----------------*/
 	RunTimeResult* Print();
+	RunTimeResult* Size();
 };
