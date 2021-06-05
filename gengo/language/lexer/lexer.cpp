@@ -54,6 +54,39 @@ Token Lexer::MakeNumberToken() {
 	}
 }
 
+Token Lexer::MakeStringToken() {
+	std::string str = "";
+	Position pos_start = this->pos.Copy();
+	bool escape_char = false;
+
+	this->Advance(); //  it starts from '"'
+
+	std::map <char, char> escape_chars = {
+		{ 'n', '\n' },
+		{ 't', '\t' }
+	};
+
+	while (this->curr_char != NULL && (this->curr_char != '"' || escape_char)) {
+		if (escape_char) {
+			str += escape_chars[this->curr_char] ? escape_chars[this->curr_char] : this->curr_char;
+			escape_char = false;
+		}
+		else {
+			if (this->curr_char == '\\')
+				escape_char = true;
+			else {
+				str += this->curr_char;
+				escape_char = false;
+			}
+		}
+
+		this->Advance();
+	}
+
+	this->Advance();
+	return Token(TOKEN_STRING, pos_start, this->pos, str);
+}
+
 Token Lexer::MakeIdentifier() {
 	std::string id_str = "";
 	std::string collection = DIGITS + LETTERS + "_";
@@ -146,6 +179,9 @@ LexerResult* Lexer::MakeTokens() {
 		}
 		else if (DIGITS.find(this->curr_char) != std::string::npos) {
 			tokens.push_back(this->MakeNumberToken());
+		}
+		else if (this->curr_char == '"') {
+			tokens.push_back(this->MakeStringToken());
 		}
 		else if (this->curr_char == '+') {
 			tokens.push_back(Token(TOKEN_PLUS, this->pos, this->pos));
@@ -276,8 +312,6 @@ LexerResult* Lexer::MakeTokens() {
 
 	return this->LexResult;
 }
-
-
 
 
 

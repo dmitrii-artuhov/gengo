@@ -14,7 +14,7 @@
 
 
 
-void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
+void run(std::string& file_name, std::string& text, Context* ctx) {
 	// Lexer
 	Lexer lexer(file_name, text);
 	LexerResult* lex_res = lexer.MakeTokens();
@@ -38,17 +38,13 @@ void run(std::string& file_name, std::string& text, SymbolTable* global_table) {
 
 			// Interpreter
 			if (GENGO_INTERPRET) {
-				Context* ctx = new Context(file_name, nullptr);
-				ctx->symbol_table = global_table;
-
 				Interpreter* interpreter = new Interpreter();
-
 				RunTimeResult* interpret_res = interpreter->Visit(parse_res->ast, ctx);
 
 				if (interpret_res->error) {
 					std::cout << interpret_res->error->As_string() << std::endl;
 				}
-				else if (interpret_res->result) {
+				else if (GENGO_LOG_TO_CONSOLE && interpret_res->result) {
 					std::cout << interpret_res->result->Represent() << std::endl;
 				}
 			}

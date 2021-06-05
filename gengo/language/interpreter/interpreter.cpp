@@ -14,6 +14,9 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == FLOAT_NODE) {
 		this->RunTimeRes = this->VisitFloatNode(node, context);
 	}
+	else if (node->type == STRING_NODE) {
+		this->RunTimeRes = this->VisitStringNode(node, context);
+	}
 	else if (node->type == VAR_ASSIGN_NODE) {
 		this->RunTimeRes = this->VisitVarAssignNode(node, context);
 	}
@@ -69,6 +72,11 @@ RunTimeResult* Interpreter::VisitFloatNode(ASTNode* node, Context* context) {
 	return (new RunTimeResult())->Success(res->SetContext(context));
 	// return (new RunTimeResult())->Success(new NodeValue(node));
 }
+RunTimeResult* Interpreter::VisitStringNode(ASTNode* node, Context* context) {
+	NodeValue* res = new NodeValue(node);
+	return (new RunTimeResult())->Success(res->SetContext(context));
+}
+
 
 // Visit variables
 RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) {
@@ -90,6 +98,9 @@ RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) 
 	}
 	else if (var_node->token.value == TYPE_FLOAT) {
 		casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
+	}
+	else if (var_node->token.value == TYPE_STRING) {
+		casted_val = NodeValue::CastToType(val, STRING_VALUE);
 	}
 
 	context->symbol_table->Set(var_node->var_name, casted_val);
@@ -117,15 +128,18 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 	}
 
 	// casting variables to specified types
-	NodeValue* casted_val;
+	NodeValue* casted_val = NodeValue::CastToType(val, var_stored->type);
 
-	if (var_stored->type == INT_VALUE) {
-		casted_val = NodeValue::CastToType(val, INT_VALUE);
-	}
-	else if (var_stored->type == FLOAT_VALUE) {
-		casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
-	}
-
+	//if (var_stored->type == INT_VALUE) {
+	//	casted_val = NodeValue::CastToType(val, INT_VALUE);
+	//}
+	//else if (var_stored->type == FLOAT_VALUE) {
+	//	casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
+	//}
+	//else if (var_stored->type == STRING_VALUE) {
+	//	casted_val = NodeValue::CastToType(val, STRING_VALUE);
+	//}
+	//
 
 	if (res->ShouldReturn()) {
 		return res;
@@ -305,16 +319,16 @@ RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
 		return res;
 
 	while (cond->IsTrue()) {
+		res->Register(this->Visit(ast->body, curr_context));
+		if (res->ShouldReturn())
+			return res;
+
 		// increment
 		if (ast->inc != nullptr) {
 			res->Register(this->Visit(ast->inc, curr_context));
 			if (res->ShouldReturn())
 				return res;
 		}
-
-		res->Register(this->Visit(ast->body, curr_context));
-		if (res->ShouldReturn())
-			return res;
 
 		// condition - is not optimized well
 		// (figure out a better way of doing this)
@@ -364,7 +378,7 @@ RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 		));
 	}
 	// exists but is not a function
-	else if (exec_func->type != FUNCTION_VALUE) {
+	else if (exec_func->type != FUNCTION_VALUE && exec_func->type != BUILT_IN_FUNCTION_VALUE) {
 		return res->Failure(new Error(
 			ERROR_RUNTIME,
 			std::string("'" + func->func_name + "' is not a function"),

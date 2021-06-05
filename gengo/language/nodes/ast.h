@@ -14,6 +14,7 @@
 enum node_t {
     INT_NODE,
     FLOAT_NODE,
+    STRING_NODE,
     
     VAR_ASSIGN_NODE,
     VAR_REASSIGN_NODE,

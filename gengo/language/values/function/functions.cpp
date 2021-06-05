@@ -4,7 +4,7 @@
 #include "../node/node.h"
 #include "../float/float.h"
 #include "../../tokens/token.h"
-
+#include "../string/string.h"
 
 
 /*--- Base Function ------------------------------------------*/
@@ -19,14 +19,6 @@ BaseFunction::BaseFunction(
    return_type(return_type),
    context(passed_ctx) {}
 
-/*
-Context* BaseFunction::GenerateNewContext(Context* parent = nullptr) {
-	Context* new_context = new Context(this->func_name, parent);
-	new_context->symbol_table = new SymbolTable();
-	
-	return new_context;		
-}
-*/
 
 RunTimeResult* BaseFunction::CheckArguments(std::vector <NodeValue*> &passed_args) {
     RunTimeResult* res = new RunTimeResult();
@@ -102,8 +94,12 @@ Function* Function::Copy() {
         this->func_args,
         this->return_type,
         this->func_body,
-        new Context(this->context->name, this->context)
+        new Context()
     );
+
+    new_func->context->name = this->context->name;
+    new_func->context->symbol_table = this->context->symbol_table;
+    new_func->context->parent = this->context->parent;
 
     return new_func;
 }
@@ -136,3 +132,125 @@ RunTimeResult* Function::Execute(Interpreter* interpreter, std::vector <NodeValu
 
     return res->Success(return_val);
 }
+
+
+
+/*--- Built In Function -------------------------------------*/
+BuiltInFunction::BuiltInFunction(
+    std::string& func_name,
+    std::vector <std::pair<std::string, Token*>>& args,
+    Token* return_type,
+    Context* passed_ctx
+) :
+    BaseFunction(func_name, args, return_type, passed_ctx)
+{}
+
+BuiltInFunction* BuiltInFunction::Copy() {
+    BuiltInFunction* new_func = new BuiltInFunction(
+        this->func_name,
+        this->func_args,
+        this->return_type,
+        new Context()
+    );
+
+    new_func->context->name = this->context->name;
+    new_func->context->symbol_table = this->context->symbol_table;
+    new_func->context->parent = this->context->parent;
+
+
+    return new_func;
+}
+
+
+RunTimeResult* BuiltInFunction::Execute(std::vector <NodeValue*>& args) {
+    RunTimeResult* res = new RunTimeResult();
+
+    res->Register(this->CheckArguments(args));
+
+    if (res->ShouldReturn())
+        return res;
+
+    res->Register(this->PopulateArguments(args));
+
+    if (res->ShouldReturn())
+        return res;
+
+    if (this->func_name == BUILT_IN_FUNCTION_PRINT) {
+        NodeValue* return_val = res->Register(
+            this->Print()
+        );
+
+
+        if (res->ShouldReturn())
+            return res;
+
+        return res->Success(return_val);
+    }
+    else if (this->func_name == BUILT_IN_FUNCTION_SIZE) {
+        NodeValue* return_val = res->Register(
+            this->Size()
+        );
+
+        if (res->ShouldReturn())
+            return res;
+
+        return res->Success(return_val);
+    }
+    else {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("No built-in function with the name '" + this->func_name + "' was defined"),
+            this->context
+        ));
+    }
+}
+
+
+/*--- Built-in functions ----------------*/
+RunTimeResult* BuiltInFunction::Print() {
+    RunTimeResult* res = new RunTimeResult();
+
+    NodeValue* val = this->context->symbol_table->Get("value");
+
+    if (!val) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No argument found for '" + BUILT_IN_FUNCTION_PRINT + "' function"),
+            this->context
+        ));
+    }
+
+    std::cout << val->Represent() << std::endl;
+
+    return res->Success(val);
+}
+
+
+RunTimeResult* BuiltInFunction::Size() {
+    RunTimeResult* res = new RunTimeResult();
+
+    NodeValue* val = this->context->symbol_table->Get("value");
+
+    if (!val) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No argument found for '" + BUILT_IN_FUNCTION_SIZE + "' function"),
+            this->context
+        ));
+    }
+
+    if (val->type != STRING_VALUE) {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Invalid argument type provided. Expected 'string'."),
+            this->context
+        ));
+    }
+
+    String* str_val = reinterpret_cast<String*> (val->value);
+    NodeValue* res_val = new NodeValue((long long)str_val->value.size());
+
+    return res->Success(res_val);
+}
+
+

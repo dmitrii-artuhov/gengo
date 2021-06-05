@@ -8,6 +8,7 @@ TOKEN_UNDEFINED = "UNDEFINED",
 
 TOKEN_INT = "INT",
 TOKEN_FLOAT = "FLOAT",
+TOKEN_STRING = "STRING",
 
 TOKEN_PLUS = "PLUS",
 TOKEN_MINUS = "MINUS",
@@ -52,7 +53,8 @@ LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 /*--- Language requirements ----------------------------------------------------------*/
 const std::string
 	TYPE_INT = "int",
-	TYPE_FLOAT = "float";
+	TYPE_FLOAT = "float",
+	TYPE_STRING = "string";
 
 const std::string
 	KEYWORD_AND = "and",
@@ -66,10 +68,17 @@ const std::string
 	KEYWORD_FUNCTION = "function",
 	KEYWORD_RETURN = "return";
 
+/*--- BuiltIn Functions -----------------------------------------------------------*/
+const std::string
+	BUILT_IN_FUNCTION_PRINT = "print",
+	BUILT_IN_FUNCTION_SIZE = "size";
+
+/*--- Types -----------------------------------------------------------*/
 
 const std::vector <std::string> TYPES = {
 	TYPE_INT,
-	TYPE_FLOAT
+	TYPE_FLOAT,
+	TYPE_STRING
 };
 
 const std::vector <std::string> KEYWORDS = {

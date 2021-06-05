@@ -50,5 +50,17 @@ public:
 class BuiltInFunction : BaseFunction {
 private:
 public:
+	BuiltInFunction(
+		std::string& func_name,
+		std::vector <std::pair<std::string, Token*>>& args,
+		Token* return_type,
+		Context* passed_ctx
+	);
 
+	BuiltInFunction* Copy();
+	RunTimeResult* Execute(std::vector <NodeValue*>& args);
+
+	/*--- Built-in functions ----------------*/
+	RunTimeResult* Print();
+	RunTimeResult* Size();
 };

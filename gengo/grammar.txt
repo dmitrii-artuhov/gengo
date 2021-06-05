@@ -16,7 +16,7 @@ arith-expr	    : term ((PLUS|MINUS) term)*
 
 term		    : factor ((MUL|DIV) factor)*
 
-factor		    : INT|FLOAT|IDENTIFIER
+factor		    : INT|FLOAT|STRING|IDENTIFIER
 				: IDENTIFIER LPAREN (expr (COMMA expr)*)? RPAREN
 			    : (PLUS|MINUS) factor
 			    : LPAREN comp-expr RPAREN

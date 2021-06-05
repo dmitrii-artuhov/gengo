@@ -22,6 +22,7 @@ public:
 
 	RunTimeResult* VisitIntNode(ASTNode* node, Context* context);
 	RunTimeResult* VisitFloatNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitStringNode(ASTNode* node, Context* context);
 
 	RunTimeResult* VisitVarAssignNode(ASTNode* node, Context* context);
 	RunTimeResult* VisitVarReassignNode(ASTNode* node, Context* context);

@@ -33,6 +33,10 @@ ASTNode::ASTNode(Token &token) {
         this->type = FLOAT_NODE;
         this->memory = reinterpret_cast<void*>(new FloatNode(token));
     }
+    else if (t == TOKEN_STRING) {
+        this->type = STRING_NODE;
+        this->memory = reinterpret_cast<void*>(new StringNode(token));
+    }
     else if (t == TOKEN_IDENTIFIER) {
         this->type = VAR_ACCESS_NODE;
         this->memory = reinterpret_cast<void*>(new VarAccessNode(token));
@@ -143,6 +147,10 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == FLOAT_NODE) {
         FloatNode* node = reinterpret_cast<FloatNode*>(this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == STRING_NODE) {
+        StringNode* node = reinterpret_cast<StringNode*>(this->memory);
         res += node->Represent();
     }
     else if (this->type == VAR_ASSIGN_NODE) {

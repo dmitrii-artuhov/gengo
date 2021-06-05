@@ -5,7 +5,9 @@
 #include "../types.h"
 #include "../../context/context.h"
 
+
 class Interpreter;
+class BuiltInFunction;
 
 class NodeValue {
 private:
@@ -18,8 +20,10 @@ public:
 
 	NodeValue();
 	NodeValue(ASTNode* node);
+	NodeValue(Context* ctx, const std::string& func_name);
 	NodeValue(long long val);
 	NodeValue(long double val);
+	NodeValue(std::string& val);
 
 	std::string Represent();
 	NodeValue* SetContext(Context* ctx);

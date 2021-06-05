@@ -18,3 +18,12 @@ std::string FloatNode::Represent() {
     return this->token.Represent();
 }
 
+
+
+// String Node
+StringNode::StringNode(Token& token) : token(token) {}
+
+std::string StringNode::Represent() {
+    return this->token.Represent();
+}
+
