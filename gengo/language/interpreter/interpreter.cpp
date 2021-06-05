@@ -319,16 +319,16 @@ RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
 		return res;
 
 	while (cond->IsTrue()) {
+		res->Register(this->Visit(ast->body, curr_context));
+		if (res->ShouldReturn())
+			return res;
+
 		// increment
 		if (ast->inc != nullptr) {
 			res->Register(this->Visit(ast->inc, curr_context));
 			if (res->ShouldReturn())
 				return res;
 		}
-
-		res->Register(this->Visit(ast->body, curr_context));
-		if (res->ShouldReturn())
-			return res;
 
 		// condition - is not optimized well
 		// (figure out a better way of doing this)
