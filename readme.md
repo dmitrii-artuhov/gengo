@@ -13,7 +13,7 @@ expr		 | (KEYWORD:TYPE)? IDENTIFIER EQ expr
 comp-expr	 | arith-expr ((AND\|OR\|EQEQ\|NE\|GT\|GTE\|LT\|LTE) arith-expr)*
 arith-expr	 | term ((PLUS\|MINUS) term)*
 term		 | factor ((MUL\|DIV) factor)*
-factor		 | INT\|FLOAT\|IDENTIFIER
+factor		 | INT\|FLOAT\|STRING\|IDENTIFIER
 &nbsp;		 | IDENTIFIER LPAREN (expr (COMMA expr)*)? RPAREN
 &nbsp;	     | (PLUS\|MINUS) factor
 &nbsp;		 | LPAREN comp-expr RPAREN
@@ -31,6 +31,38 @@ if-else-expr | KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
 else-expr	 | KEYWORD:otherwise LBRACE statements RBRACE
 for-expr	 | KEYWORD:loop LPAREN (expr)? NEWLINE expr NEWLINE (expr)? RPAREN LBRACE statements RBRACE
 
+
+## Features (pre-release 0.6.0)
+- Strings
+- Built-in Functions (`print`, `size`)
+
+## Snippets (strings, built-in functions)
+Strings:
+```sh
+gengo > string s = "Hello World!";
+Hello World!
+```
+
+New built-in functions:
+```sh
+string s1 = "What does ";
+string s2 = "'Gengo' ";
+string s3 = "mean?";
+```
+```sh
+gengo > print(s1 + s2 + s3);
+What does 'Gengo' mean?
+```
+
+```sh
+string name = "Dmitrii Art"
+```
+```sh
+gengo > print(size(name));
+11
+```
+
+0.5.0 (alpha) Pre-release functionality
 
 ## Features (pre-release 0.5.0)
 - Functions
