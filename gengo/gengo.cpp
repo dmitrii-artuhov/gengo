@@ -21,6 +21,7 @@ int main() {
 		FileInput(path);
 	}
 	
+	system("pause");
 	return 0;
 }
 
