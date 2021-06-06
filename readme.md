@@ -3,7 +3,7 @@
 
 
 ## Features (release 1.0.0)
-- Console usage
+- Reading from console
 - Reading from files
 - Functions
 - Arrays (with built-in functions: `size`, `push`, `pop`)
