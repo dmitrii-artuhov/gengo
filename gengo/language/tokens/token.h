@@ -19,11 +19,14 @@ TOKEN_AND = "AND",
 TOKEN_OR = "OR",
 TOKEN_NOT = "NOT",
 
-TOKEN_LPAREN = "LPAREN",
-TOKEN_RPAREN = "RPAREN",
+TOKEN_LPAREN = "LPAREN", // (
+TOKEN_RPAREN = "RPAREN", // )
 
 TOKEN_LBRACE = "LBRACE", // {
 TOKEN_RBRACE = "RBRACE", // }
+
+TOKEN_LSQUARE = "LSQUARE", // [
+TOKEN_RSQUARE = "RSQUARE", // ]
 
 TOKEN_EQ = "EQ",
 TOKEN_EQEQ = "EQEQ", // ==
@@ -54,7 +57,8 @@ LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const std::string
 	TYPE_INT = "int",
 	TYPE_FLOAT = "float",
-	TYPE_STRING = "string";
+	TYPE_STRING = "string",
+	TYPE_ARRAY = "array";
 
 const std::string
 	KEYWORD_AND = "and",
@@ -78,7 +82,8 @@ const std::string
 const std::vector <std::string> TYPES = {
 	TYPE_INT,
 	TYPE_FLOAT,
-	TYPE_STRING
+	TYPE_STRING,
+	TYPE_ARRAY
 };
 
 const std::vector <std::string> KEYWORDS = {

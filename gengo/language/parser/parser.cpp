@@ -137,7 +137,7 @@ ParseResult* Parser::Expr() {
 		return res->Success(new ASTNode(type_token, var_name, node));
 	}
 	// INDETIFIER EQ expr
-	else if (this->curr_token.type == TOKEN_IDENTIFIER && this->tokens[this->token_index + 1].type == TOKEN_EQ) {
+	else if (this->curr_token.type == TOKEN_IDENTIFIER && this->tokens[this->token_index + 1LL].type == TOKEN_EQ) {
 		// it is ok to put 'this->token_index + 1' because if current token is an indetifier then after it there will be at least TOKEN_EOF
 		// try variable reassignment
 		std::string var_name = this->curr_token.value;
@@ -305,7 +305,8 @@ ParseResult* Parser::Factor() {
 		this->curr_token.type == TOKEN_FLOAT ||
 		this->curr_token.type == TOKEN_STRING) {
 		// check for function call
-		if (this->tokens[this->token_index + 1LL].type == TOKEN_LPAREN) {
+		if (this->curr_token.type == TOKEN_IDENTIFIER &&
+			this->tokens[this->token_index + 1LL].type == TOKEN_LPAREN) {
 			// func call
 			node = res->Register(this->FuncCallExpr());
 
@@ -314,12 +315,65 @@ ParseResult* Parser::Factor() {
 			else
 				return res->Success(node);
 		}
+		// check for array element access/reassign
+		else if (this->curr_token.type == TOKEN_IDENTIFIER &&
+			this->tokens[this->token_index + 1LL].type == TOKEN_LSQUARE) {
+			// TODO: array[index]
+			std::string array_name = this->curr_token.value;
+			this->Advance();
+
+			std::vector <ASTNode*> array_indexes;
+
+			while (this->curr_token.type == TOKEN_LSQUARE) {
+				this->Advance(); // skipped '['
+
+				ASTNode* array_index = res->Register(this->Expr());
+
+				if (res->error)
+					return res;
+
+				array_indexes.push_back(array_index);
+
+				if (this->curr_token.type != TOKEN_RSQUARE) {
+					return res->Failure(new Error(
+						ERROR_INVALID_SYNTAX,
+						std::string("Expected ']' after array access"),
+						this->curr_token.pos_start,
+						this->curr_token.pos_end
+					));
+				}
+
+				this->Advance(); // skipped ']'
+			}
+
+			if (this->curr_token.type != TOKEN_EQ) {
+				return res->Success(new ASTNode(array_name, array_indexes, true));
+			}
+			else {
+				this->Advance();
+				ASTNode* new_val = res->Register(this->Expr());
+
+				if (res->error)
+					return res;
+
+				// array_name, array_indexes, new_val
+				return res->Success(new ASTNode(array_name, array_indexes, new_val));
+			}
+		}
 		else {
 			node = new ASTNode(this->curr_token);
 			this->Advance();
 
 			return res->Success(node);
 		}
+	}
+	else if (this->curr_token.type == TOKEN_LSQUARE) {
+		ASTNode* arrayNode = res->Register(this->ArrayExpr());
+
+		if (res->error)
+			return res;
+		else
+			return res->Success(arrayNode);
 	}
 	else if (this->curr_token.type == TOKEN_KEYWORD && this->curr_token.value == KEYWORD_IF) {
 		ASTNode* ifExpr = res->Register(this->IfExpr());
@@ -385,6 +439,48 @@ ParseResult* Parser::Factor() {
 		this->curr_token.pos_start,
 		this->curr_token.pos_end
 	));
+}
+
+ParseResult* Parser::ArrayExpr() {
+	ParseResult* res = new ParseResult();
+
+	std::vector <ASTNode*> vec; // stuff inside a vector
+
+	if (this->curr_token.type != TOKEN_LSQUARE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected '['"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	while (this->curr_token.type != TOKEN_RSQUARE) {
+		ASTNode* expr = res->Register(this->Expr());
+
+		if (res->error)
+			return res;
+
+		vec.push_back(expr);
+
+		if (this->curr_token.type == TOKEN_COMMA)
+			this->Advance();
+	}
+
+	if (this->curr_token.type != TOKEN_RSQUARE) {
+		return res->Failure(new Error(
+			ERROR_INVALID_SYNTAX,
+			std::string("Expected ']'"),
+			this->curr_token.pos_start,
+			this->curr_token.pos_end
+		));
+	}
+
+	this->Advance();
+
+	return res->Success(new ASTNode(vec, true));
 }
 
 ParseResult* Parser::IfExpr() {

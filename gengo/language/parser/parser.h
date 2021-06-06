@@ -28,6 +28,7 @@ public:
 	ParseResult* ArithExpr();
 	ParseResult* Term();
 	ParseResult* Factor();
+	ParseResult* ArrayExpr();
 	ParseResult* IfExpr();
 	ParseResult* ForExpr();
 	ParseResult* FuncDeclExpr();

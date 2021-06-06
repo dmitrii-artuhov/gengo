@@ -226,6 +226,14 @@ LexerResult* Lexer::MakeTokens() {
 			tokens.push_back(Token(TOKEN_RBRACE, this->pos, this->pos));
 			this->Advance();
 		}
+		else if (this->curr_char == '[') {
+			tokens.push_back(Token(TOKEN_LSQUARE, this->pos, this->pos));
+			this->Advance();
+		}
+		else if (this->curr_char == ']') {
+			tokens.push_back(Token(TOKEN_RSQUARE, this->pos, this->pos));
+			this->Advance();
+		}
 		else if (this->curr_char == ',') {
 			tokens.push_back(Token(TOKEN_COMMA, this->pos, this->pos));
 			this->Advance();

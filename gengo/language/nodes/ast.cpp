@@ -10,6 +10,7 @@
 #include "./ast_statements/statements.h"
 #include "./ast_for/for.h"
 #include "./ast_functions/func.h"
+#include "./ast_array/array.h"
 
 
 
@@ -102,10 +103,18 @@ ASTNode::ASTNode(Token& token, ASTNode* node) {
 }
 
 // statements
-ASTNode::ASTNode(std::vector <ASTNode*>& nodes) {
-    this->type = STATEMENTS_NODE;
-    this->memory = reinterpret_cast<void*>(new StatementsNode(nodes));
+ASTNode::ASTNode(std::vector <ASTNode*>& nodes, bool isArray) {
+    if (!isArray) {
+        this->type = STATEMENTS_NODE;
+        this->memory = reinterpret_cast<void*>(new StatementsNode(nodes));
+    }
+    else {
+        this->type = ARRAY_DECL_NODE;
+        this->memory = reinterpret_cast<void*>(new ArrayDeclNode(nodes));
+    }
 }
+
+// arrays
 
 
 // if conditions
@@ -121,20 +130,32 @@ ASTNode::ASTNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body) {
     this->memory = reinterpret_cast <void*>(new ForNode(init, cond, inc, body));
 }
 
-// function nodes
+// function nodes / arrays
 ASTNode::ASTNode(std::string &func_name, std::vector <std::pair <std::string, Token*>> &args, Token* return_type, ASTNode* func_body) {
     this->type = FUNC_DECL_NODE;
     this->memory = reinterpret_cast<void*>(new FuncDeclNode(func_name, args, return_type, func_body));
 }
 
-ASTNode::ASTNode(std::string& func_name, std::vector <ASTNode*>& args) {
-    this->type = FUNC_CALL_NODE;
-    this->memory = reinterpret_cast<void*>(new FuncCallNode(func_name, args));
+ASTNode::ASTNode(std::string& func_name, std::vector <ASTNode*>& args, bool isArray) {
+    if (!isArray) {
+        this->type = FUNC_CALL_NODE;
+        this->memory = reinterpret_cast<void*>(new FuncCallNode(func_name, args));
+    }
+    else {
+        this->type = ARRAY_ACCESS_NODE;
+        this->memory = reinterpret_cast<void*>(new ArrayAccessNode(func_name, args));
+    }
 }
 
 ASTNode::ASTNode(ASTNode* expr) {
     this->type = RETURN_NODE;
     this->memory = reinterpret_cast<void*>(new ReturnNode(expr));
+}
+
+// array reassign
+ASTNode::ASTNode(std::string& name, std::vector <ASTNode*>& vec, ASTNode* new_val) {
+    this->type = ARRAY_REASSIGN_NODE;
+    this->memory = reinterpret_cast<void*> (new ArrayReassignNode(name, vec, new_val));
 }
 
 // methods
@@ -175,6 +196,18 @@ std::string ASTNode::Represent() {
     }
     else if (this->type == STATEMENTS_NODE) {
         StatementsNode* node = reinterpret_cast<StatementsNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == ARRAY_DECL_NODE) {
+        ArrayDeclNode* node = reinterpret_cast<ArrayDeclNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == ARRAY_ACCESS_NODE) {
+        ArrayAccessNode* node = reinterpret_cast<ArrayAccessNode*> (this->memory);
+        res += node->Represent();
+    }
+    else if (this->type == ARRAY_REASSIGN_NODE) {
+        ArrayReassignNode* node = reinterpret_cast<ArrayReassignNode*> (this->memory);
         res += node->Represent();
     }
     else if (this->type == IF_NODE) {

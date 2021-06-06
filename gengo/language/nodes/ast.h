@@ -24,6 +24,10 @@ enum node_t {
     UNOP_NODE,
 
     STATEMENTS_NODE,
+
+    ARRAY_DECL_NODE,
+    ARRAY_ACCESS_NODE,
+    ARRAY_REASSIGN_NODE,
     
     IF_NODE,
 
@@ -58,8 +62,8 @@ public:
     ASTNode(ASTNode* left, Token& token, ASTNode* right);
     ASTNode(Token& token, ASTNode* node);
 
-    // statements
-    ASTNode(std::vector <ASTNode*>& nodes);
+    // statements/arrays
+    ASTNode(std::vector <ASTNode*>& nodes, bool isArray=false);
 
     // if conditions
     ASTNode(std::vector <std::pair <ASTNode*, ASTNode*>> &cases, ASTNode* else_case);
@@ -67,11 +71,13 @@ public:
     // for nodes
     ASTNode(ASTNode* init, ASTNode* cond, ASTNode* inc, ASTNode* body);
 
-    // function nodes
+    // function nodes/arrays
     ASTNode(std::string &func_name, std::vector <std::pair <std::string, Token*>> &args, Token* return_type, ASTNode* func_body);
-    //ASTNode(std::string &func_name, std::vector <Token*> &args);
-    ASTNode(std::string& func_name, std::vector <ASTNode*>& args);
+    ASTNode(std::string& func_name, std::vector <ASTNode*>& args, bool isArray=false); // functions/arrays
     ASTNode(ASTNode* expr); // return statement
+
+    // array reassign
+    ASTNode(std::string &name, std::vector <ASTNode*> &vec, ASTNode* new_val);
 
     std::string Represent();
 };

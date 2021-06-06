@@ -11,9 +11,9 @@
 
 
 const bool GENGO_SHOW_TOKENS = !true;
-const bool GENGO_SHOW_AST = !true;
-const bool GENGO_LOG_TO_CONSOLE = !true;
+const bool GENGO_SHOW_AST = true;
+const bool GENGO_LOG_TO_CONSOLE = true;
 
 
 const bool GENGO_PARSE = true;
-const bool GENGO_INTERPRET = true;
+const bool GENGO_INTERPRET = !true;
