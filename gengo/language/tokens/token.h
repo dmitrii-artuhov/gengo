@@ -58,7 +58,8 @@ const std::string
 	TYPE_INT = "int",
 	TYPE_FLOAT = "float",
 	TYPE_STRING = "string",
-	TYPE_ARRAY = "array";
+	TYPE_ARRAY = "array",
+	TYPE_ANY = "any";
 
 const std::string
 	KEYWORD_AND = "and",
@@ -74,8 +75,13 @@ const std::string
 
 /*--- BuiltIn Functions -----------------------------------------------------------*/
 const std::string
-	BUILT_IN_FUNCTION_PRINT = "print",
-	BUILT_IN_FUNCTION_SIZE = "size";
+BUILT_IN_FUNCTION_PRINT = "print",
+
+BUILT_IN_FUNCTION_SIZE = "size",
+
+BUILT_IN_FUNCTION_LENGTH = "length",
+BUILT_IN_FUNCTION_PUSH = "push",
+BUILT_IN_FUNCTION_POP = "pop";
 
 /*--- Types -----------------------------------------------------------*/
 
@@ -83,7 +89,8 @@ const std::vector <std::string> TYPES = {
 	TYPE_INT,
 	TYPE_FLOAT,
 	TYPE_STRING,
-	TYPE_ARRAY
+	TYPE_ARRAY,
+	TYPE_ANY
 };
 
 const std::vector <std::string> KEYWORDS = {

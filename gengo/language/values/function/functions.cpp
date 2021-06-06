@@ -3,6 +3,8 @@
 #include "../types.h"
 #include "../node/node.h"
 #include "../float/float.h"
+#include "../int/int.h"
+#include "../array/array.h"
 #include "../../tokens/token.h"
 #include "../string/string.h"
 
@@ -186,9 +188,39 @@ RunTimeResult* BuiltInFunction::Execute(std::vector <NodeValue*>& args) {
 
         return res->Success(return_val);
     }
+    else if (this->func_name == BUILT_IN_FUNCTION_LENGTH) {
+        NodeValue* return_val = res->Register(
+            this->Length()
+        );
+
+        if (res->ShouldReturn())
+            return res;
+
+        return res->Success(return_val);
+    }
     else if (this->func_name == BUILT_IN_FUNCTION_SIZE) {
         NodeValue* return_val = res->Register(
             this->Size()
+        );
+
+        if (res->ShouldReturn())
+            return res;
+
+        return res->Success(return_val);
+    }
+    else if (this->func_name == BUILT_IN_FUNCTION_PUSH) {
+        NodeValue* return_val = res->Register(
+            this->Push()
+        );
+
+        if (res->ShouldReturn())
+            return res;
+
+        return res->Success(return_val);
+    }
+    else if (this->func_name == BUILT_IN_FUNCTION_POP) {
+        NodeValue* return_val = res->Register(
+            this->Pop()
         );
 
         if (res->ShouldReturn())
@@ -226,7 +258,7 @@ RunTimeResult* BuiltInFunction::Print() {
 }
 
 
-RunTimeResult* BuiltInFunction::Size() {
+RunTimeResult* BuiltInFunction::Length() {
     RunTimeResult* res = new RunTimeResult();
 
     NodeValue* val = this->context->symbol_table->Get("value");
@@ -234,7 +266,7 @@ RunTimeResult* BuiltInFunction::Size() {
     if (!val) {
         return res->Failure(new Error(
             ERROR_INTERNAL,
-            std::string("No argument found for '" + BUILT_IN_FUNCTION_SIZE + "' function"),
+            std::string("No argument found for '" + BUILT_IN_FUNCTION_LENGTH + "' function"),
             this->context
         ));
     }
@@ -251,6 +283,128 @@ RunTimeResult* BuiltInFunction::Size() {
     NodeValue* res_val = new NodeValue((long long)str_val->value.size());
 
     return res->Success(res_val);
+}
+
+
+RunTimeResult* BuiltInFunction::Size() {
+    RunTimeResult* res = new RunTimeResult();
+
+    NodeValue* val = this->context->symbol_table->Get("value");
+
+    if (!val) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No argument found for '" + BUILT_IN_FUNCTION_SIZE + "' function"),
+            this->context
+        ));
+    }
+
+    if (val->type != ARRAY_VALUE) {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Invalid argument type provided. Expected 'array'."),
+            this->context
+        ));
+    }
+
+    Array* arr_val = reinterpret_cast<Array*> (val->value);
+    NodeValue* res_val = new NodeValue((long long)arr_val->array_body.size());
+
+    return res->Success(res_val);
+}
+
+
+RunTimeResult* BuiltInFunction::Push() {
+    RunTimeResult* res = new RunTimeResult();
+
+    NodeValue* arr = this->context->symbol_table->Get("array");
+    NodeValue* elem = this->context->symbol_table->Get("element");
+
+    if (!arr) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No first argument found for '" + BUILT_IN_FUNCTION_PUSH + "' function"),
+            this->context
+        ));
+    }
+
+    if (arr->type != ARRAY_VALUE) {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Invalid first argument type provided. Expected 'array'."),
+            this->context
+        ));
+    }
+
+    if (!elem) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No second argument found for '" + BUILT_IN_FUNCTION_PUSH + "' function"),
+            this->context
+        ));
+    }
+
+    Array* arr_val = reinterpret_cast<Array*> (arr->value);
+    arr_val->array_body.push_back(elem);
+
+    return res->Success(elem);
+}
+
+
+
+RunTimeResult* BuiltInFunction::Pop() {
+    RunTimeResult* res = new RunTimeResult();
+
+    NodeValue* arr = this->context->symbol_table->Get("array");
+    NodeValue* ind = this->context->symbol_table->Get("index");
+
+    if (!arr) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No first argument found for '" + BUILT_IN_FUNCTION_POP + "' function"),
+            this->context
+        ));
+    }
+
+    if (arr->type != ARRAY_VALUE) {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Invalid first argument type provided. Expected 'array'."),
+            this->context
+        ));
+    }
+
+    if (!ind) {
+        return res->Failure(new Error(
+            ERROR_INTERNAL,
+            std::string("No second argument found for '" + BUILT_IN_FUNCTION_POP + "' function"),
+            this->context
+        ));
+    }
+
+    if (ind->type != INT_VALUE) {
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Invalid first argument type provided. Expected 'int'."),
+            this->context
+        ));
+    }
+
+    IntNumber* index = reinterpret_cast<IntNumber*> (ind->value);
+
+    Array* arr_val = reinterpret_cast<Array*> (arr->value);
+
+    if (!arr_val->InBounds(index->value, arr_val->array_body))
+        return res->Failure(new Error(
+            ERROR_RUNTIME,
+            std::string("Index out of bounds"),
+            this->context
+        ));
+
+    NodeValue* del_val = arr_val->array_body[index->value];
+    arr_val->array_body.erase(arr_val->array_body.begin() + index->value);
+
+    return res->Success(del_val);
 }
 
 

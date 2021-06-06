@@ -22,10 +22,28 @@ int main() {
 		new NodeValue(ctx, BUILT_IN_FUNCTION_PRINT)
 	);
 
+	// Length
+	ctx->symbol_table->Set(
+		BUILT_IN_FUNCTION_LENGTH,
+		new NodeValue(ctx, BUILT_IN_FUNCTION_LENGTH)
+	);
+
 	// Size
 	ctx->symbol_table->Set(
 		BUILT_IN_FUNCTION_SIZE,
 		new NodeValue(ctx, BUILT_IN_FUNCTION_SIZE)
+	);
+
+	// Push
+	ctx->symbol_table->Set(
+		BUILT_IN_FUNCTION_PUSH,
+		new NodeValue(ctx, BUILT_IN_FUNCTION_PUSH)
+	);
+
+	// Pop
+	ctx->symbol_table->Set(
+		BUILT_IN_FUNCTION_POP,
+		new NodeValue(ctx, BUILT_IN_FUNCTION_POP)
 	);
 
 

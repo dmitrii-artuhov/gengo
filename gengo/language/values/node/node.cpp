@@ -82,7 +82,7 @@ NodeValue::NodeValue(Context* ctx, const std::string& func_name) {
 			this->context
 		));
 	}
-	else if (name == BUILT_IN_FUNCTION_SIZE) {
+	else if (name == BUILT_IN_FUNCTION_LENGTH) {
 		Token* arg_token = new Token(),
 			* return_token = new Token();
 		arg_token->type = return_token->type = TOKEN_TYPE;
@@ -95,6 +95,62 @@ NodeValue::NodeValue(Context* ctx, const std::string& func_name) {
 			this->context
 		));
 	}
+	else if (name == BUILT_IN_FUNCTION_SIZE) {
+		Token* arg_token = new Token(),
+			* return_token = new Token();
+		arg_token->type = return_token->type = TOKEN_TYPE;
+		arg_token->value = TYPE_ARRAY, return_token->value = TYPE_INT;
+
+		this->value = reinterpret_cast<void*> (new BuiltInFunction(
+			name,
+			std::vector <std::pair <std::string, Token*>>{ { std::string("value"), arg_token }},
+			return_token,
+			this->context
+		));
+	}
+	else if (name == BUILT_IN_FUNCTION_PUSH) {
+		Token* arg_token_1 = new Token(),
+			* arg_token_2 = new Token(),
+			* return_token = new Token();
+
+		arg_token_1->type = arg_token_2->type = return_token->type = TOKEN_TYPE;
+
+		arg_token_1->value = TYPE_ARRAY;
+		arg_token_2->value = TYPE_ANY;
+		return_token->value = TYPE_ANY;
+
+		this->value = reinterpret_cast<void*> (new BuiltInFunction(
+			name,
+			std::vector <std::pair <std::string, Token*>>{
+				{ std::string("array"), arg_token_1 },
+				{ std::string("element"), arg_token_2 }
+			},
+			return_token,
+			this->context
+		));
+	}
+	else if (name == BUILT_IN_FUNCTION_POP) {
+		Token* arg_token_1 = new Token(),
+			* arg_token_2 = new Token(),
+			* return_token = new Token();
+
+		arg_token_1->type = arg_token_2->type = return_token->type = TOKEN_TYPE;
+
+		arg_token_1->value = TYPE_ARRAY;
+		arg_token_2->value = TYPE_INT;
+		return_token->value = TYPE_ANY;
+
+		this->value = reinterpret_cast<void*> (new BuiltInFunction(
+			name,
+			std::vector <std::pair <std::string, Token*>>{
+				{ std::string("array"), arg_token_1 },
+				{ std::string("index"), arg_token_2 }
+			},
+			return_token,
+			this->context
+		));
+	}
+
 }
 
 

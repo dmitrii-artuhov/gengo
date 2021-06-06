@@ -61,6 +61,12 @@ public:
 	RunTimeResult* Execute(std::vector <NodeValue*>& args);
 
 	/*--- Built-in functions ----------------*/
+	// general
 	RunTimeResult* Print();
+	// strings
+	RunTimeResult* Length();
+	// arrays
 	RunTimeResult* Size();
+	RunTimeResult* Push();
+	RunTimeResult* Pop();
 };
