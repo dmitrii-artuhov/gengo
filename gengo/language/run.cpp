@@ -14,7 +14,7 @@
 
 
 
-void run(std::string& file_name, std::string& text, Context* ctx) {
+void run(std::string& file_name, std::string& text, Context* ctx, bool GENGO_LOG_TO_CONSOLE) {
 	// Lexer
 	Lexer lexer(file_name, text);
 	LexerResult* lex_res = lexer.MakeTokens();

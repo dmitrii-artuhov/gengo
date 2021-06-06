@@ -9,4 +9,4 @@
 	std::vector<Token>,
 	IllegalCharError*
 >*/
-void run(std::string& file_name, std::string& text, Context* ctx);
+void run(std::string& file_name, std::string& text, Context* ctx, bool GENGO_LOG_TO_CONSOLE=true);

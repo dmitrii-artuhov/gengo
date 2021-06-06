@@ -15,9 +15,11 @@ arith-expr	 | term ((PLUS\|MINUS) term)*
 term		 | factor ((MUL\|DIV) factor)*
 factor		 | INT\|FLOAT\|STRING\|IDENTIFIER
 &nbsp;		 | IDENTIFIER LPAREN (expr (COMMA expr)*)? RPAREN
+&nbsp;		 | IDENTIFIER LSQUARE expr RSQUARE (LSQUARE expr RSQUARE)* (EQ expr)?
 &nbsp;	     | (PLUS\|MINUS) factor
 &nbsp;		 | LPAREN comp-expr RPAREN
 &nbsp;		 | NOT comp-expr
+&nbsp;		 | array-expr
 &nbsp;		 | if-expr
 &nbsp;		 | for-expr
 &nbsp;		 | func-def
@@ -30,7 +32,19 @@ if-else-expr | KEYWORD:elif LPAREN expr RPAREN LBRACE statements RBRACE
 &nbsp;		 | (if-else-expr\|else-expr)?
 else-expr	 | KEYWORD:otherwise LBRACE statements RBRACE
 for-expr	 | KEYWORD:loop LPAREN (expr)? NEWLINE expr NEWLINE (expr)? RPAREN LBRACE statements RBRACE
+array-expr	 | LSQUARE (expr (COMMA expr)*)? RSQUARE
 
+
+
+## Features (release 1.0.0)
+- Console usage
+- Reading from files
+- Functions
+- Arrays (with built-in functions: `size`, `push`, `pop`)
+- Strings (with built-in functions: `length`)
+- 64-bit Integers and Floats (`int`, `float`)
+- General built-in functions: `print`
+- Error messages
 
 ## Features (pre-release 0.6.0)
 - Strings
