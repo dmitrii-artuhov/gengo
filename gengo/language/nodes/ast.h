@@ -8,6 +8,7 @@
 #include "./ast_opers/opers.h"
 #include "./ast_if/if.h"
 #include "./ast_for/for.h"
+#include "./ast_array/array.h"
 #include "./ast_statements/statements.h"
 #include "./ast_functions/func.h"
 

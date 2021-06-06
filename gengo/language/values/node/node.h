@@ -24,10 +24,14 @@ public:
 	NodeValue(long long val);
 	NodeValue(long double val);
 	NodeValue(std::string& val);
+	NodeValue(std::vector <NodeValue*>& vec);
 
 	std::string Represent();
 	NodeValue* SetContext(Context* ctx);
 	NodeValue* PropContext(Context* ctx);
+	// for arrays
+	RunTimeResult* GetElementByIndex(std::vector <NodeValue*>& indexes);
+	RunTimeResult* ReassingElementByIndex(std::vector <NodeValue*>& indexes, NodeValue* new_val);
 
 	RunTimeResult* Add(NodeValue* other);
 	RunTimeResult* Sub(NodeValue* other);

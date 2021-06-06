@@ -33,6 +33,10 @@ public:
 
 	RunTimeResult* VisitStatementsNode(ASTNode* node, Context* context);
 	
+	RunTimeResult* VisitArrayDeclNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitArrayAccessNode(ASTNode* node, Context* context);
+	RunTimeResult* VisitArrayReassignNode(ASTNode* node, Context* context);
+
 	RunTimeResult* VisitIfNode(ASTNode* node, Context* context);
 	RunTimeResult* VisitForNode(ASTNode* node, Context* context);
 

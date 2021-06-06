@@ -35,6 +35,16 @@ RunTimeResult* Interpreter::Visit(ASTNode* node, Context* context) {
 	else if (node->type == STATEMENTS_NODE) {
 		this->RunTimeRes = this->VisitStatementsNode(node, context);
 	}
+	else if (node->type == ARRAY_DECL_NODE) {
+		this->RunTimeRes = this->VisitArrayDeclNode(node, context);
+	}
+	else if (node->type == ARRAY_ACCESS_NODE) {
+		this->RunTimeRes = this->VisitArrayAccessNode(node, context);
+	}
+	else if (node->type == ARRAY_REASSIGN_NODE) {
+		this->RunTimeRes = this->VisitArrayReassignNode(node, context);
+
+	}
 	else if (node->type == IF_NODE) {
 		this->RunTimeRes = this->VisitIfNode(node, context);
 	}
@@ -102,6 +112,17 @@ RunTimeResult* Interpreter::VisitVarAssignNode(ASTNode* node, Context* context) 
 	else if (var_node->token.value == TYPE_STRING) {
 		casted_val = NodeValue::CastToType(val, STRING_VALUE);
 	}
+	else if (var_node->token.value == TYPE_ARRAY &&
+		val->type != ARRAY_VALUE) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("Expression must match 'array' type"),
+			context
+		));
+	}
+	else {
+		casted_val = val;
+	}
 
 	context->symbol_table->Set(var_node->var_name, casted_val);
 	return res->Success(casted_val);
@@ -128,18 +149,9 @@ RunTimeResult* Interpreter::VisitVarReassignNode(ASTNode* node, Context* context
 	}
 
 	// casting variables to specified types
-	NodeValue* casted_val = NodeValue::CastToType(val, var_stored->type);
-
-	//if (var_stored->type == INT_VALUE) {
-	//	casted_val = NodeValue::CastToType(val, INT_VALUE);
-	//}
-	//else if (var_stored->type == FLOAT_VALUE) {
-	//	casted_val = NodeValue::CastToType(val, FLOAT_VALUE);
-	//}
-	//else if (var_stored->type == STRING_VALUE) {
-	//	casted_val = NodeValue::CastToType(val, STRING_VALUE);
-	//}
-	//
+	NodeValue* casted_val = val;
+	if (val->type != var_stored->type)
+		casted_val = NodeValue::CastToType(val, var_stored->type);
 
 	if (res->ShouldReturn()) {
 		return res;
@@ -260,6 +272,118 @@ RunTimeResult* Interpreter::VisitStatementsNode(ASTNode* node, Context* context)
 	return res;
 }
 
+// Visit arrays
+RunTimeResult* Interpreter::VisitArrayDeclNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+
+	ArrayDeclNode* curr_node = reinterpret_cast<ArrayDeclNode*>(node->memory);
+	std::vector <NodeValue*> vec;
+
+	for (int i = 0; i < curr_node->body.size(); i++) {
+		NodeValue* val = res->Register(this->Visit(curr_node->body[i], context));
+
+		if (res->ShouldReturn())
+			return res;
+
+		vec.push_back(val);
+	}
+
+	return res->Success((new NodeValue(vec))->SetContext(context));
+}
+RunTimeResult* Interpreter::VisitArrayAccessNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+
+	ArrayAccessNode* curr_node = reinterpret_cast<ArrayAccessNode*> (node->memory);
+	std::string array_name = curr_node->array_name;
+
+	// get array from context
+	NodeValue* array_body = context->symbol_table->Get(array_name);
+
+	if (array_body == nullptr) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("'" + array_name + "' is not declared"),
+			context
+		));
+	}
+	else if (array_body->type != ARRAY_VALUE) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("'" + array_name + "' is not array"),
+			context
+		));
+	}
+
+	std::vector <NodeValue*> indexes;
+
+	for (ASTNode* ast : curr_node->array_indexes) {
+		NodeValue* __val = res->Register(this->Visit(ast, context));
+
+		if (res->ShouldReturn())
+			return res;
+
+		indexes.push_back(__val);
+	}
+
+	NodeValue* val = res->Register(
+		array_body->GetElementByIndex(indexes)
+	);
+
+	if (res->ShouldReturn())
+		return res;
+
+	return res->Success(val);
+}
+RunTimeResult* Interpreter::VisitArrayReassignNode(ASTNode* node, Context* context) {
+	RunTimeResult* res = new RunTimeResult();
+
+	ArrayReassignNode* curr_node = reinterpret_cast<ArrayReassignNode*> (node->memory);
+	std::string array_name = curr_node->array_name;
+
+	// get array from context
+	NodeValue* array_body = context->symbol_table->Get(array_name);
+
+	if (array_body == nullptr) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("'" + array_name + "' is not declared"),
+			context
+		));
+	}
+	else if (array_body->type != ARRAY_VALUE) {
+		return res->Failure(new Error(
+			ERROR_RUNTIME,
+			std::string("'" + array_name + "' is not array"),
+			context
+		));
+	}
+
+	std::vector <NodeValue*> indexes;
+
+	for (ASTNode* ast : curr_node->array_indexes) {
+		NodeValue* __val = res->Register(this->Visit(ast, context));
+
+		if (res->ShouldReturn())
+			return res;
+
+		indexes.push_back(__val);
+	}
+
+	NodeValue* new_val = res->Register(this->Visit(curr_node->new_val, context));
+
+	if (res->ShouldReturn())
+		return res;
+
+	NodeValue* val = res->Register(
+		array_body->ReassingElementByIndex(indexes, new_val)
+	);
+
+	if (res->ShouldReturn())
+		return res;
+
+	return res->Success(val);
+}
+
 // Visit if nodes
 RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
@@ -292,8 +416,6 @@ RunTimeResult* Interpreter::VisitIfNode(ASTNode* node, Context* context) {
 
 	return res->Success(NULL);
 }
-
-
 // Visit for node
 RunTimeResult* Interpreter::VisitForNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
@@ -356,8 +478,6 @@ RunTimeResult* Interpreter::VisitFuncDeclNode(ASTNode* node, Context* context) {
 	context->symbol_table->Set(func->func_name, func_value);
 	return res->Success(func_value);
 }
-
-
 RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 
@@ -404,8 +524,6 @@ RunTimeResult* Interpreter::VisitFuncCallNode(ASTNode* node, Context* context) {
 
 	return res->Success(return_val);
 }
-
-
 RunTimeResult* Interpreter::VisitReturnNode(ASTNode* node, Context* context) {
 	RunTimeResult* res = new RunTimeResult();
 

@@ -16,4 +16,4 @@ const bool GENGO_LOG_TO_CONSOLE = true;
 
 
 const bool GENGO_PARSE = true;
-const bool GENGO_INTERPRET = !true;
+const bool GENGO_INTERPRET = true;
