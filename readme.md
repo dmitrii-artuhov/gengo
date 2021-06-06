@@ -12,8 +12,8 @@
 - General built-in functions: `print`
 - Error messages
 
-## Snipets
-Examples:
+## Examples
+Concatenate array of strings:
 ```sh
 array arr = ["1", "2", "3", "4", "5"];
 
@@ -36,7 +36,7 @@ print(concat(arr));
 12345
 ```
 
-
+'Hello World!' program:
 ```sh
 string str = "Hello World!";
 print(str);
@@ -48,6 +48,7 @@ Hello World!
 ```
 
 
+Factorial of a number:
 ```sh
 function factorial(a: int) -> int {
 	if(a == 0) {
